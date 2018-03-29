@@ -145,7 +145,6 @@ class FunSetSuite extends FunSuite {
   test("filter contains elements in S that satisfy predicate P") {
     new TestSets {
       val s4: Set = union(union(s1, s2), s3) // (1, 2, 3)
-      printSet(s4)
 
       val s5: Set = filter(s4, x => x % 2 == 0)
       assert(contains(s5, 2), "s5 contains 2")
@@ -159,4 +158,31 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("forall") {
+    val s1: Set = union(union(singletonSet(2), singletonSet(4)), singletonSet(6)) // (2, 4, 6)
+    assert(forall(s1, x => x % 2 == 0), "elements of s1 are all even")
+
+    val s2: Set = union(union(singletonSet(2), singletonSet(4)), singletonSet(7)) // (2, 4, 7)
+    assert(!forall(s2, x => x % 2 == 0), "elements of s2 are not all even")
+  }
+
+  test("exists") {
+    val s1: Set = union(union(singletonSet(1), singletonSet(5)), singletonSet(7)) // (1, 5, 7)
+    assert(!exists(s1, x => x % 2 == 0), "No element in s1 is even")
+
+    val s2: Set = union(union(singletonSet(1), singletonSet(4)), singletonSet(7)) // (1, 4, 7)
+    assert(exists(s2, x => x % 2 == 0), "at least one element in s2 is even")
+  }
+
+  test("map") {
+    val s1: Set = union(union(singletonSet(1), singletonSet(5)), singletonSet(7)) // (1, 5, 7)
+    val s2: Set = map(s1, x => x + 2)
+
+    printSet(s1)
+    // printSet(s2)
+
+    val s3: Int => Boolean = x => x == 1 || x == 5 || x == 7
+    printSet(s3)
+
+  }
 }
