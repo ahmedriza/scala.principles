@@ -85,7 +85,6 @@ object FunSets {
   def map(s: Set, f: Int => Int): Set = {
     x => {
       val fx = f(x)
-      println(s"x = $x, fx = $fx")
       s(fx)
     }
   }
