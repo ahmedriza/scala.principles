@@ -119,6 +119,29 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("union of {1,2,3,4} and {-1000,0}") {
+    val s1 = union(singletonSet(-1000), singletonSet(0))
+
+    val s2 =
+      union(
+        union(
+          union(
+            singletonSet(1), singletonSet(2)
+          ),
+          singletonSet(3)
+        ),
+        singletonSet(4)
+      )
+
+    val s3 = union(s1, s2)
+
+    assert(contains(s3, -1000), "Union s1 and s2")
+    assert(contains(s3, 0), "Union s1 and s2")
+    assert(contains(s3, 1), "Union s1 and s2")
+    assert(contains(s3, 2), "Union s1 and s2")
+    assert(contains(s3, 3), "Union s1 and s2")
+  }
+
   test("intersect contains elements common to both sets") {
     new TestSets {
       val nullSet: Set = intersect(s1, s2)
@@ -176,13 +199,29 @@ class FunSetSuite extends FunSuite {
 
   test("map") {
     val s1: Set = union(union(singletonSet(1), singletonSet(5)), singletonSet(7)) // (1, 5, 7)
-    val s2: Set = map(s1, x => x + 2)
+    val s2: Set = map(s1, x => x * 2)
+    assert(contains(s2, 2), "s2 contains 2")
+    assert(contains(s2, 10), "s2 contains 10")
+    assert(contains(s2, 14), "s2 contains 14")
 
-    printSet(s1)
-    // printSet(s2)
+    // 1,3,4,5,7,1000
+    val s3: Set =
+      union(
+        union(
+          union(
+            union(
+              union(singletonSet(1), singletonSet(3)),
+              singletonSet(4)
+            ), singletonSet(5)
+          ), singletonSet(7)
+        ), singletonSet(1000)
+      )
 
-    val s3: Int => Boolean = x => x == 1 || x == 5 || x == 7
-    printSet(s3)
-
+    val s4: Set = map(s3, x => x + 1)
+    assert(contains(s4, 2), "s4 contains 2")
+    assert(contains(s4, 4), "s4 contains 4")
+    assert(contains(s4, 5), "s4 contains 5")
+    assert(contains(s4, 6), "s4 contains 6")
+    assert(contains(s4, 8), "s4 contains 8")
   }
 }
