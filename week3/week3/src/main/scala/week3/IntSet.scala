@@ -1,5 +1,8 @@
+package week3
+
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
+import scala.List
 
 abstract class IntSet {
   def contains(x: Int): Boolean
@@ -30,7 +33,7 @@ abstract class IntSet {
 //             E  E
 
 /**
-  * Singleton Empty object (only one instance exists).
+  * Singleton week3.Empty object (only one instance exists).
   */
 class Empty extends IntSet {
   override def contains(x: Int): Boolean = false

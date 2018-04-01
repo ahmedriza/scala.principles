@@ -1,3 +1,5 @@
+package week3
+
 
 class Node(private val x: Int, private val msg: String) {
 
@@ -52,7 +54,7 @@ class Leaf extends NodeSet {
 
 class Element(node: Node, left: NodeSet, right: NodeSet) extends NodeSet {
 
-  println(s"Constructing Element with node: $node, left: $left, right: $right")
+  println(s"Constructing week3.Element with node: $node, left: $left, right: $right")
 
   override def contains(x: Node): Boolean = {
     if (x < node) left contains x
