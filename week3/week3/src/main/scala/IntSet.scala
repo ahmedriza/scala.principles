@@ -100,26 +100,6 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
 
   def union_(other: IntSet): IntSet = {
     ((left union right) union other) incl elem
-    /*
-    val afterLeft = left.union(right)
-    val afterOther = afterLeft.union(other)
-    afterOther.incl(elem)
-    */
-
-    /*
-    def loop(set: IntSet, other: IntSet): IntSet = {
-      println(s"set is $set, other is $other")
-      set match {
-        case e: Empty => other
-        case e: NonEmpty =>
-          val afterLeft = loop(left, right)
-          val afterOther = loop(afterLeft, other)
-          afterOther.incl(elem)
-      }
-    }
-
-    loop(this, other)
-    */
   }
 
   //
@@ -133,7 +113,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
 
     def loop(set: IntSet, other: IntSet): IntSet = {
       set match {
-        case e: Empty => other
+        case _: Empty => other
         case e: NonEmpty =>
           val afterLeft = loop(e.left, other.incl(e.elem))
           loop(e.right, afterLeft)
@@ -176,7 +156,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
   override def intersect(other: IntSet): IntSet = {
     def loop(set: IntSet, result: IntSet): IntSet = {
       set match {
-        case e: Empty => result
+        case _: Empty => result
         case e: NonEmpty =>
           val afterLeft = loop(e.left, result)
           val afterRight = loop(e.right, afterLeft)
@@ -189,6 +169,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
     }
     loop(this, new Empty)
   }
+
 }
 
 object IntSet {
@@ -220,5 +201,6 @@ object IntSet {
     println(s9_list)
 
     println(s"s7 = ${s7.fromList(s9_list)}")
+
   }
 }
