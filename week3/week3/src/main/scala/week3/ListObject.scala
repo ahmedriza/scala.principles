@@ -1,5 +1,7 @@
 package week3
 
+import scala.annotation.tailrec
+
 
 /**
   * A list is either:
@@ -75,16 +77,27 @@ object ListObject {
 
   def singleton[T](elem: T) = new Cons(elem, new MyNil)
 
-  // Write a function nth that takes an integer n and a list and selects the n'th element of the list.
-  // Elements are number from 0.  If index is outside the range from 0 up to the length of the list minus one,
-  // an IndexOutOfBoundsException should be thrown.
-
-  def nth[T](index: Int, myList: MyList[T]): T = ???
+  /**
+    * nth that takes an integer n and a list and selects the n'th element of the list.
+    * Elements are number from 0.  If index is outside the range from 0 up to the length of the list minus one,
+    * an IndexOutOfBoundsException should be thrown.
+    * @param index index
+    * @param list list
+    * @return value at index
+    * @throws IndexOutOfBoundsException if the index is out of bounds
+    */
+  def nth[T](index: Int, list: MyList[T]): T = {
+    if (list.isEmpty) throw new IndexOutOfBoundsException
+    if (index == 0) {
+      list.head
+    } else {
+      nth(index - 1, list.tail)
+    }
+  }
 
   def main(args: Array[String]): Unit = {
-    val list1 = singleton(10)
-    val list2 = new Cons(20, list1)
-    println(list1)
-    println(list2)
+    val list = new Cons(30, new Cons(20, new Cons(10, new MyNil)))
+    println(list)
+    println(nth(2, list))
   }
 }
