@@ -1,9 +1,13 @@
-
+import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 abstract class IntSet {
   def contains(x: Int): Boolean
   def incl(x: Int): IntSet
   def union(other: IntSet): IntSet
+  def intersect(other: IntSet): IntSet
+  def flatten(): List[Int]
+  def fromList(list: List[Int]): IntSet
 }
 
 // Consider implementing sets as binary trees.
@@ -28,15 +32,18 @@ abstract class IntSet {
 /**
   * Singleton Empty object (only one instance exists).
   */
-object Empty extends IntSet {
+class Empty extends IntSet {
   override def contains(x: Int): Boolean = false
-  override def incl(x: Int): IntSet = new NonEmpty(x, Empty, Empty)
+  override def incl(x: Int): IntSet = new NonEmpty(x, new Empty, new Empty)
   override def union(other: IntSet): IntSet = other
-
+  override def intersect(other: IntSet): IntSet = new Empty
   override def toString: String = s"E"
+  override def flatten(): List[Int] = List()
+
+  override def fromList(list: List[Int]): IntSet = new Empty
 }
 
-class NonEmpty(elem: Int, left: IntSet, right: IntSet) extends IntSet {
+class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSet {
 
   override def contains(x: Int): Boolean = {
     if (x < elem) left contains x
@@ -91,8 +98,96 @@ class NonEmpty(elem: Int, left: IntSet, right: IntSet) extends IntSet {
 
   override def toString: String = s"{$left $elem $right}"
 
-  override def union(other: IntSet): IntSet = {
-    ???
+  def union_(other: IntSet): IntSet = {
+    ((left union right) union other) incl elem
+    /*
+    val afterLeft = left.union(right)
+    val afterOther = afterLeft.union(other)
+    afterOther.incl(elem)
+    */
+
+    /*
+    def loop(set: IntSet, other: IntSet): IntSet = {
+      println(s"set is $set, other is $other")
+      set match {
+        case e: Empty => other
+        case e: NonEmpty =>
+          val afterLeft = loop(left, right)
+          val afterOther = loop(afterLeft, other)
+          afterOther.incl(elem)
+      }
+    }
+
+    loop(this, other)
+    */
+  }
+
+  //
+  //   4
+  //  / \
+  // E   5
+  //    / \
+  //   E   E
+
+  def union(other: IntSet): IntSet = {
+
+    def loop(set: IntSet, other: IntSet): IntSet = {
+      set match {
+        case e: Empty => other
+        case e: NonEmpty =>
+          val afterLeft = loop(e.left, other.incl(e.elem))
+          loop(e.right, afterLeft)
+      }
+    }
+
+    loop(other, this)
+
+    // fromList(other.flatten())
+  }
+
+  def flatten(): List[Int] = {
+
+    def loop(set: IntSet, buffer: ListBuffer[Int]): Unit = {
+      set match {
+        case e: Empty => ()
+        case e: NonEmpty =>
+          buffer += e.elem
+          loop(e.left, buffer)
+          loop(e.right, buffer)
+      }
+    }
+
+    val buffer = ListBuffer[Int]()
+    loop(this, buffer)
+    buffer.toList
+  }
+
+  override def fromList(list: List[Int]): IntSet = {
+    @tailrec
+    def loop(xs: List[Int], acc: IntSet): IntSet = {
+      xs match {
+        case Nil => acc
+        case h :: t => loop(t, acc.incl(h))
+      }
+    }
+    loop(list, this)
+  }
+
+  override def intersect(other: IntSet): IntSet = {
+    def loop(set: IntSet, result: IntSet): IntSet = {
+      set match {
+        case e: Empty => result
+        case e: NonEmpty =>
+          val afterLeft = loop(e.left, result)
+          val afterRight = loop(e.right, afterLeft)
+          if (other.contains(e.elem)) {
+            afterRight.incl(e.elem)
+          } else {
+            afterRight
+          }
+      }
+    }
+    loop(this, new Empty)
   }
 }
 
@@ -100,16 +195,30 @@ object IntSet {
 
   def main(args: Array[String]): Unit = {
 
-    val head = Empty.incl(6)
-    val n1 = head.incl(5)
-    val n2 = n1.incl(11)
-    val n3 = n2.incl(7)
-    val n4 = n3.incl(12)
-    val n5 = n4.incl(8)
-    val n6 = n5.incl(9)
+    val s1 = new Empty().incl(6)
+    val s2 = s1.incl(5)
+    val s3 = s2.incl(11)
+    val s4 = s3.incl(7)
+    val s5 = s4.incl(12)
+    val s6 = s5.incl(8)
+    val s7 = s6.incl(9)
 
-    val n7 = n6.incl(7)
+    val s8 = new NonEmpty(4, new Empty, new Empty)
+    val s9 = s8.incl(5)
 
-    println(n7)
+    // val s9 = s7.union(s8)
+    // println(s9)
+
+    println(s"s7 = $s7")
+    println(s"s9 = $s9")
+    val s10 = s7 union s9
+    println(s"s7 union s9 = $s10")
+
+    val s7_list = s7.flatten()
+    println(s7_list)
+    val s9_list = s9.flatten()
+    println(s9_list)
+
+    println(s"s7 = ${s7.fromList(s9_list)}")
   }
 }
