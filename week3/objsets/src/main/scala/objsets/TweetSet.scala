@@ -129,7 +129,7 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = new Empty
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   /**
     * The following methods are already implemented
@@ -152,6 +152,10 @@ class NonEmpty(val elem: Tweet, val left: TweetSet, val right: TweetSet) extends
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
 
+    left.filterAcc(p, if (p(elem)) acc.incl(elem) else acc)  union
+      right.filterAcc(p, if (p(elem)) acc.incl(elem) else acc)
+
+    /*
     def loop(ts: TweetSet, acc: TweetSet): TweetSet = {
       ts match {
         case _: Empty => acc
@@ -161,7 +165,8 @@ class NonEmpty(val elem: Tweet, val left: TweetSet, val right: TweetSet) extends
       }
     }
 
-    loop(this, acc)
+    loop(this, new Empty)
+    */
   }
 
   def union(that: TweetSet): TweetSet = {
@@ -264,9 +269,9 @@ object GoogleVsApple {
 
 object Main extends App {
   // Print the trending tweets
-  GoogleVsApple.trending foreach println
+  // GoogleVsApple.trending foreach println
 
-  /*
+
   println("------------------------------------------------------------------")
 
   val s1 = new Empty
@@ -279,6 +284,7 @@ object Main extends App {
   result.foreach(println)
   println("------------------------------------------------------------------")
 
+  /*
   println("s3 descendingByRetweet: ")
   println(s3.descendingByRetweet.foreach(println))
 

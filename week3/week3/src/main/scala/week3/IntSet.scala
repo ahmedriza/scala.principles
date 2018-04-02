@@ -12,7 +12,8 @@ abstract class IntSet {
   def flatten(): List[Int]
   def fromList(list: List[Int]): IntSet
   def max: Int
-  def print: Unit
+  def filter(p: Int => Boolean, acc: IntSet): IntSet
+  def print(): Unit
 }
 
 // Consider implementing sets as binary trees.
@@ -49,7 +50,9 @@ class Empty extends IntSet {
 
   override def max: Int = throw new UnsupportedOperationException
 
-  override def print: Unit = ()
+  override def filter(p: Int => Boolean, acc: IntSet): IntSet = acc
+
+  override def print(): Unit = ()
 }
 
 class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSet {
@@ -107,7 +110,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
 
   override def toString: String = s"{$left $elem $right}"
 
-  def union_(other: IntSet): IntSet = {
+  def union(other: IntSet): IntSet = {
     ((left union right) union other) incl elem
   }
 
@@ -118,7 +121,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
   //    / \
   //   E   E
 
-  def union(other: IntSet): IntSet = {
+  def union_(other: IntSet): IntSet = {
 
     def loop(set: IntSet, other: IntSet): IntSet = {
       set match {
@@ -196,7 +199,26 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
     loop(this, this.elem)
   }
 
-  def print: Unit = {
+  override def filter(p: Int => Boolean, acc: IntSet): IntSet = {
+
+    left.filter(p, if (p(elem)) acc.incl(elem) else acc)  union
+      right.filter(p, if (p(elem)) acc.incl(elem) else acc)
+
+    /*
+    def loop(set: IntSet, acc: IntSet): IntSet = {
+      set match {
+        case _: Empty => acc
+        case e: NonEmpty =>
+          val afterLeft = loop(e.left, if (p(e.elem)) acc.incl(e.elem) else acc)
+          loop(e.right, afterLeft)
+      }
+    }
+
+    loop(this, new Empty)
+    */
+  }
+
+  def print(): Unit = {
     @tailrec
     def loop(sets: List[IntSet]): Unit = {
       sets match {
@@ -213,6 +235,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
     }
     loop(List(this))
   }
+
 }
 
 object IntSet {
@@ -247,7 +270,9 @@ object IntSet {
 
     println(s"max of s7: " + s7.max)
 
-    println("---------------------------------")
-    s7.print
+    println("Filtered elements of s7: " + s7.filter(i => i % 2 == 0, new Empty))
+
+    // println("---------------------------------")
+    // s7.print()
   }
 }
