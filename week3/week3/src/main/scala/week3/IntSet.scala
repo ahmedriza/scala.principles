@@ -172,7 +172,6 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
     }
     loop(this, new Empty)
   }
-
 }
 
 object IntSet {

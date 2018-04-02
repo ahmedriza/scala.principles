@@ -74,5 +74,5 @@ object TweetReader {
     if (curSets.isEmpty) acc
     else unionOfAllTweetSets(curSets.tail, acc.union(curSets.head))
 
-  lazy val allTweets: TweetSet = unionOfAllTweetSets(tweetSets, new Empty)
+  val allTweets: TweetSet = unionOfAllTweetSets(tweetSets, new Empty)
 }
