@@ -11,6 +11,8 @@ abstract class IntSet {
   def intersect(other: IntSet): IntSet
   def flatten(): List[Int]
   def fromList(list: List[Int]): IntSet
+  def max: Int
+  def print: Unit
 }
 
 // Consider implementing sets as binary trees.
@@ -44,6 +46,10 @@ class Empty extends IntSet {
   override def flatten(): List[Int] = List()
 
   override def fromList(list: List[Int]): IntSet = new Empty
+
+  override def max: Int = throw new UnsupportedOperationException
+
+  override def print: Unit = ()
 }
 
 class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSet {
@@ -145,6 +151,7 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
     buffer.toList
   }
 
+
   override def fromList(list: List[Int]): IntSet = {
     @tailrec
     def loop(xs: List[Int], acc: IntSet): IntSet = {
@@ -171,6 +178,40 @@ class NonEmpty(val elem: Int, val left: IntSet, val right: IntSet) extends IntSe
       }
     }
     loop(this, new Empty)
+  }
+
+  /**
+    * Find the maximum element of the set.
+    */
+  def max: Int = {
+
+    def loop(set: IntSet, currentMax: Int): Int = {
+      set match {
+        case _: Empty => currentMax
+        case e: NonEmpty =>
+          loop(e.left, if (e.elem > currentMax) e.elem else currentMax)
+          loop(e.right, if (e.elem > currentMax) e.elem else currentMax)
+      }
+    }
+    loop(this, this.elem)
+  }
+
+  def print: Unit = {
+    @tailrec
+    def loop(sets: List[IntSet]): Unit = {
+      sets match {
+        case Nil => ()
+        case head :: tail => head match {
+          case _: Empty =>
+            println("E")
+            loop(tail)
+          case ne: NonEmpty =>
+            println(ne.elem)
+            loop(ne.left :: ne.right :: tail)
+        }
+      }
+    }
+    loop(List(this))
   }
 }
 
@@ -204,5 +245,9 @@ object IntSet {
 
     println(s"s7 = ${s7.fromList(s9_list)}")
 
+    println(s"max of s7: " + s7.max)
+
+    println("---------------------------------")
+    s7.print
   }
 }
