@@ -107,7 +107,8 @@ abstract class TweetSet {
 }
 
 class Empty extends TweetSet {
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
+
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = new Empty
 
   /**
     * The following methods are already implemented
@@ -122,9 +123,25 @@ class Empty extends TweetSet {
   def foreach(f: Tweet => Unit): Unit = ()
 }
 
-class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
+class NonEmpty(val elem: Tweet, val left: TweetSet, val right: TweetSet) extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
+
+    def loop(ts: TweetSet): Unit = {
+      ts match {
+        case e: Empty => ()
+        case e: NonEmpty =>
+          if (p(e.elem)) {
+            println(e.elem)
+          }
+          loop(e.left)
+          loop(e.right)
+      }
+    }
+
+    loop(acc)
+    new Empty
+  }
 
 
   /**
@@ -197,5 +214,15 @@ object GoogleVsApple {
 
 object Main extends App {
   // Print the trending tweets
-  GoogleVsApple.trending foreach println
+  // TODO
+  // GoogleVsApple.trending foreach println
+
+  val tweets = TweetReader.tweetMap
+  val gizModoTweets: List[Tweet] = tweets.getOrElse("gizmodo", List())
+
+  val s1 = new Empty
+  val s2 = s1.incl(new Tweet("ahmed", "hello all", 1))
+  val s3 = s2.incl(new Tweet("ahmed", "how are we todya?", 2))
+
+  s3.filterAcc(tweet => tweet.retweets > 1, s3)
 }
