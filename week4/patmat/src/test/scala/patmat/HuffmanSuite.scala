@@ -44,6 +44,83 @@ class HuffmanSuite extends FunSuite {
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
   }
 
+  test("combine of some leaf lists and forks") {
+    val e = Leaf('e', 1)
+    val f = Leaf('f', 1)
+    val g = Leaf('g', 1)
+    val h = Leaf('h', 1)
+
+    val leafList = List(e, f, g, h)
+    val comb1 = combine(leafList)
+    val comb2 = combine(comb1)
+
+    val expected = List(Fork(
+      Fork(Leaf('e',1), Leaf('f',1), List('e', 'f'), 2),
+      Fork(Leaf('g',1), Leaf('h',1), List('g', 'h'), 2),
+      List('e', 'f', 'g', 'h'),
+      4)
+    )
+
+    assert(comb2 === expected)
+  }
+
+  test("until on list of code trees") {
+    val a = Leaf('a', 8)
+    val b = Leaf('b', 3)
+    val c = Leaf('c', 1)
+    val d = Leaf('d', 1)
+    val e = Leaf('e', 1)
+    val f = Leaf('f', 1)
+    val g = Leaf('g', 1)
+    val h = Leaf('h', 1)
+
+    val leafList = List(a, b, c, d, e, f, g, h)
+    val result = until(singleton, combine)(leafList)
+
+    val expected =
+      List(
+        Fork(
+          Fork(
+            Fork(Leaf('a',8),Leaf('b',3),List('a', 'b'),11),
+            Fork(Leaf('c',1),Leaf('d',1),List('c', 'd'),2),
+            List('a', 'b', 'c', 'd'),13),
+          Fork(
+            Fork(Leaf('e',1),Leaf('f',1),List('e', 'f'),2),
+            Fork(Leaf('g',1),Leaf('h',1),List('g', 'h'),2),
+            List('e', 'f', 'g', 'h'),4),
+          List('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'),17))
+
+    assert(result === expected)
+  }
+
+  test("createCodeTree from some text") {
+    def repeat(c: Char, n: Int): List[Char] = List.fill(n)(c)
+
+    val codeTree = createCodeTree(
+      repeat('a', 8) ++
+        repeat('b', 3) ++
+        repeat('c', 1) ++
+        repeat('d', 1) ++
+        repeat('e', 1) ++
+        repeat('f', 1) ++
+        repeat('g', 1) ++
+        repeat('h', 1)
+    )
+
+    val expected =
+      Fork(
+        Fork(
+          Fork(Leaf('h',1), Leaf('g',1), List('h', 'g'),2),
+          Fork(Leaf('f',1), Leaf('e',1), List('f', 'e'),2),
+          List('h', 'g', 'f', 'e'),4),
+        Fork(
+          Fork(Leaf('d',1), Leaf('c',1), List('d', 'c'),2),
+          Fork(Leaf('b',3), Leaf('a',8), List('b', 'a'),11),
+          List('d', 'c', 'b', 'a'),13),
+        List('h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'),17)
+
+    assert(codeTree === expected)
+  }
 
   test("decode and encode a very short text should be identity") {
     new TestTrees {
