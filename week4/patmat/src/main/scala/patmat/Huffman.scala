@@ -181,7 +181,30 @@ object Huffman {
     * the resulting list of characters.
     */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-    ???
+
+    def loop(currentBits: List[Bit]): List[Char] = currentBits match {
+      case Nil => Nil
+      case (b :: bs) => {
+        println(s"Looking for $b")
+        val char = treeWalk(tree, b)
+        println(s"Found char: $char")
+        char :: loop(bs)
+      }
+    }
+
+    def treeWalk(root: CodeTree, bit: Bit): Char = {
+      tree match {
+        case Leaf(c, _) => c
+        case Fork(left, right, _, _) =>
+          if (bit == 0) {
+            treeWalk(left, bit)
+          } else {
+            treeWalk(right, bit)
+          }
+      }
+    }
+
+    loop(bits)
   }
 
   /**

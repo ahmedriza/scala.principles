@@ -94,7 +94,6 @@ class HuffmanSuite extends FunSuite {
   }
 
   test("createCodeTree from some text") {
-    def repeat(c: Char, n: Int): List[Char] = List.fill(n)(c)
 
     val codeTree = createCodeTree(
       repeat('a', 8) ++
@@ -122,10 +121,30 @@ class HuffmanSuite extends FunSuite {
     assert(codeTree === expected)
   }
 
+  test("decode of a simple tree") {
+
+    val codeTree = createCodeTree(
+      repeat('a', 8) ++
+        repeat('b', 3) ++
+        repeat('c', 1) ++
+        repeat('d', 1) ++
+        repeat('e', 1) ++
+        repeat('f', 1) ++
+        repeat('g', 1) ++
+        repeat('h', 1)
+    )
+
+    val result = decode(codeTree, List(1,0,0,0,1,0,1,0))
+    println(result)
+  }
+
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
   }
 
+  // ---------
+
+  private def repeat(c: Char, n: Int): List[Char] = List.fill(n)(c)
 }
