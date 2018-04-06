@@ -341,22 +341,53 @@ object Huffman {
     */
   def convert(tree: CodeTree): CodeTable = {
 
-    def loop(currentTree: CodeTree, acc: CodeTable): CodeTable = currentTree match {
-      case Leaf(c, _) => (c, List(0)) :: acc
-      case Fork(left, right, _, _) =>
-        // merge the left and right code tables
-        ???
-    }
-
     ???
   }
+
+  //                     (hgfedcba) 17
+  //                 /                 \
+  //          (hgfe) 4                   (dcba) 13
+  //       /           \               /         \
+  //   (hg) 2          (fe) 2         (dc) 2      (ba) 11
+  // /      \          /     \       /    \      /    \
+  // h(1)   g(1)     f(1)    e(1)   d(1)   c(1) b(3)  a(8)
+
+  def loop(currentTree: CodeTree, acc: CodeTable): CodeTable = {
+    currentTree match {
+      // when the passed in tree is just a leaf
+      case Leaf(c, _) =>
+        println(s"Leaf of currentTree, c = $c")
+        (c, List(0)) :: acc
+
+      // otherwise it will be a fork
+      case Fork(left, right, _, _) =>
+        // merge the left and right code tables
+        left match {
+          case Leaf(c, _) =>
+            println(s"Leaf of left, $left, c = $c")
+            (c, List(0)) :: acc
+          case Fork(_, _, chars, _) =>
+            loop(left, chars.map(c => (c, List(0))) ++ acc)
+        }
+        right match {
+          case Leaf(c, _) =>
+            println(s"Leaf of right, $right, c = $c")
+            (c, List(1)) :: acc
+          case Fork(_, _, chars, _) =>
+            loop(right, chars.map(c => (c, List(1))) ++ acc)
+        }
+    }
+  }
+
 
   /**
     * This function takes two code tables and merges them into one. Depending on how you
     * use it in the `convert` method above, this merge method might also do some transformations
     * on the two parameter code tables.
     */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
+    a ++ b
+  }
 
   /**
     * This function encodes `text` according to the code tree `tree`.
