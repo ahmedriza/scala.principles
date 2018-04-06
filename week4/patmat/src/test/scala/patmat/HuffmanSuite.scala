@@ -118,6 +118,14 @@ class HuffmanSuite extends FunSuite {
           List('d', 'c', 'b', 'a'),13),
         List('h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'),17)
 
+    //                     (hgfedcba) 17
+    //                 /                 \
+    //          (hgfe) 4                   (dcba) 13
+    //       /           \               /         \
+    //   (hg) 2          (fe) 2         (dc) 2      (ba) 11
+    // /      \          /     \       /    \      /    \
+    // h(1)   g(1)     f(1)    e(1)   d(1)   c(1) b(3)  a(8)
+
     assert(codeTree === expected)
   }
 
@@ -134,8 +142,25 @@ class HuffmanSuite extends FunSuite {
         repeat('h', 1)
     )
 
-    val result = decode(codeTree, List(1,0,0,0,1,0,1,0))
-    println(result)
+    val result = decode(codeTree, List(1,0,0,0,1,0,1,0,1))
+    assert(result === List('d', 'f', 'c'))
+  }
+
+  test("encode of a simple text") {
+
+    val codeTree = createCodeTree(
+      repeat('a', 8) ++
+        repeat('b', 3) ++
+        repeat('c', 1) ++
+        repeat('d', 1) ++
+        repeat('e', 1) ++
+        repeat('f', 1) ++
+      repeat('g', 1) ++
+        repeat('h', 1)
+    )
+
+    val result = encode(codeTree)(List('d', 'f', 'c'))
+    assert(result === List(1,0,0,0,1,0,1,0,1))
   }
 
   test("decode and encode a very short text should be identity") {

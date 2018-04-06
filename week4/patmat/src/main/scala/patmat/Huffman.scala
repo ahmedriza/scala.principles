@@ -151,7 +151,8 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
-  def until(p: List[CodeTree] => Boolean, combiner: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
+  def until(p: List[CodeTree] => Boolean,
+    combiner: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
     if (p(trees)) {
       trees
     } else {
@@ -182,30 +183,23 @@ object Huffman {
     */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
 
-    def loop(currentBits: List[Bit]): List[Char] = currentBits match {
-      case Nil => Nil
-      case (b :: bs) => {
-        println(s"Looking for $b")
-        val char = treeWalk(tree, b)
-        println(s"Found char: $char")
-        char :: loop(bs)
-      }
-    }
-
-    def treeWalk(root: CodeTree, bit: Bit): Char = {
-      tree match {
-        case Leaf(c, _) => c
+    def treeWalk(currentNode: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = {
+      currentNode match {
+        case Leaf(c, _) =>
+          // walk tree again from the original root and remaining bits, add the character found to the acc
+          treeWalk(tree, bits, c :: acc)
         case Fork(left, right, _, _) =>
-          if (bit == 0) {
-            treeWalk(left, bit)
-          } else {
-            treeWalk(right, bit)
+          bits match {
+            // base case, exhausted bits, so return the accumulated list of decoded characters
+            case Nil => acc.reverse
+            case (b :: bs) => if (b == 0) treeWalk(left, bs, acc) else treeWalk(right, bs, acc)
           }
       }
     }
 
-    loop(bits)
+    treeWalk(tree, bits, List())
   }
+
 
   /**
     * A Huffman coding tree for the French language.
@@ -288,7 +282,7 @@ object Huffman {
   /**
     * Write a function that returns the decoded secret
     */
-  def decodedSecret: List[Char] = ???
+  def decodedSecret: List[Char] = decode(frenchCode, secret)
 
 
   // Part 4a: Encoding using Huffman tree
@@ -297,7 +291,33 @@ object Huffman {
     * This function encodes `text` using the code tree `tree`
     * into a sequence of bits.
     */
-  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+
+    def treeWalk(currentNode: CodeTree, ch: Char, acc: List[Bit]): List[Bit] = {
+      currentNode match {
+        case Leaf(_, _) => acc.reverse
+        case Fork(left, right, chars, _) =>
+          // examine left and right branches to decide where to go
+          if (testBranch(left, ch)) {
+            treeWalk(left, ch, 0 :: acc)
+          } else {
+            treeWalk(right, ch, 1 :: acc)
+          }
+      }
+    }
+
+    def testBranch(branch: CodeTree, ch: Char): Boolean = {
+      branch match {
+        case Leaf(c, _) => if (c == ch) true else false
+        case Fork(_, _, cs, _) => if (cs.contains(ch)) true else false
+      }
+    }
+
+    text match {
+      case Nil => Nil
+      case (c :: cs) => treeWalk(tree, c, List()) ++ encode(tree)(cs)
+    }
+  }
 
   // Part 4b: Encoding using code table
 
@@ -307,7 +327,9 @@ object Huffman {
     * This function returns the bit sequence that represents the character `char` in
     * the code table `table`.
     */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = {
+    ???
+  }
 
   /**
     * Given a code tree, create a code table which contains, for every character in the
@@ -317,7 +339,17 @@ object Huffman {
     * a valid code tree that can be represented as a code table. Using the code tables of the
     * sub-trees, think of how to build the code table for the entire tree.
     */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable = {
+
+    def loop(currentTree: CodeTree, acc: CodeTable): CodeTable = currentTree match {
+      case Leaf(c, _) => (c, List(0)) :: acc
+      case Fork(left, right, _, _) =>
+        // merge the left and right code tables
+        ???
+    }
+
+    ???
+  }
 
   /**
     * This function takes two code tables and merges them into one. Depending on how you
@@ -348,5 +380,6 @@ object Huffman {
     println(freqs)
     println(freqs.sortWith((p1, p2) => p1._2 < p2._2))
 
+    println(decodedSecret)
   }
 }
