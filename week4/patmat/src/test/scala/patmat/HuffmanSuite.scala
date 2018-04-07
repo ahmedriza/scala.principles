@@ -182,6 +182,25 @@ class HuffmanSuite extends FunSuite {
     println(result)
   }
 
+  test("mergeCodeTables on very small tables") {
+    val a: CodeTable = List(('a', List(0)))
+    val b: CodeTable = List(('a', List(1)), ('d', List(0)))
+
+    val m1 = mergeCodeTables(a, b)
+    println(m1)
+  }
+
+  test("mergeCodeTables on small tables") {
+    val a: CodeTable = List(('a', List(0)), ('b', List(1)), ('c', List(0)))
+    val b: CodeTable = List(('a', List(1)), ('d', List(0)))
+    val c: CodeTable = List(('a', List(1)), ('b', List(0)))
+
+    val m1 = mergeCodeTables(a, b)
+    val m2 = mergeCodeTables(m1, c)
+    println(m1)
+    println(m2)
+  }
+
   // ---------
 
   private def repeat(c: Char, n: Int): List[Char] = List.fill(n)(c)
