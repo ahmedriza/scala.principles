@@ -351,6 +351,15 @@ object Huffman {
   //   (hg) 2          (fe) 2         (dc) 2      (ba) 11
   // /      \          /     \       /    \      /    \
   // h(1)   g(1)     f(1)    e(1)   d(1)   c(1) b(3)  a(8)
+  //
+  // a: (1,1,1)
+  // b: (1,1,0)
+  // c: (1,0,1)
+  // d: (1,0,0)
+  // e: (0,1,1)
+  // f: (0,1,0)
+  // g: (0,0,1)
+  // h: (0,0,0)
 
   def loop(tree: CodeTree, acc:CodeTable): CodeTable = {
     tree match {
@@ -359,23 +368,16 @@ object Huffman {
       case Fork(left, right, _, _) =>
         val afterLeft = left match {
           case Leaf(c, _) =>
-            loop(left, mergeCodeTables(List((c, List(0))), acc))
+            loop(left, mergeCodeTables(acc, List((c, List(0)))))
           case Fork(_, _, chars, _) =>
-            loop(left, mergeCodeTables(chars.map(c => (c, List(0))), acc))
+            loop(left, mergeCodeTables(acc, chars.map(c => (c, List(0)))))
         }
         right match {
           case Leaf(c, _) =>
-            loop(right, mergeCodeTables(List((c, List(1))), afterLeft))
+            loop(right, mergeCodeTables(afterLeft, List((c, List(1)))))
           case Fork(_, _, chars, _) =>
-            loop(right, mergeCodeTables(chars.map(c => (c, List(1))), afterLeft))
+            loop(right, mergeCodeTables(afterLeft, chars.map(c => (c, List(1)))))
         }
-
-      /*
-      case Fork(left, right, chars, _) =>
-        val l = mergeCodeTables(chars.map(c => (c, List(0))), loop(left, acc))
-        val r = mergeCodeTables(chars.map(c => (c, List(1))), loop(right, acc))
-        mergeCodeTables(l, r)
-        */
     }
   }
 
@@ -386,9 +388,6 @@ object Huffman {
     */
   def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
     println(s"merging code tables $a and $b")
-    // CodeTable = [(Char, [Bit])]
-    // a = [('a', [0]), ('b', [1]), ('c', [0])]
-    // b = [('a', [1])]
     a match {
       case Nil => b
       case (aPair :: as) =>
