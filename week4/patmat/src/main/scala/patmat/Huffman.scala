@@ -89,11 +89,7 @@ object Huffman {
   private def insertChar(ch: Char, list: List[(Char, Int)]): List[(Char, Int)] = {
     list match {
       case Nil => List((ch, 1))
-      case (x :: xs) =>
-        if (x._1 == ch)
-          (x._1, x._2 + 1) :: xs
-        else
-          x :: insertChar(ch, xs)
+      case (x :: xs) => if (x._1 == ch) (x._1, x._2 + 1) :: xs else x :: insertChar(ch, xs)
     }
   }
 
@@ -302,7 +298,7 @@ object Huffman {
     def treeWalk(currentNode: CodeTree, ch: Char, acc: List[Bit]): List[Bit] = {
       currentNode match {
         case Leaf(_, _) => acc.reverse
-        case Fork(left, right, chars, _) =>
+        case Fork(left, right, _, _) =>
           // examine left and right branches to decide where to go
           if (testBranch(left, ch)) {
             treeWalk(left, ch, 0 :: acc)
@@ -314,8 +310,8 @@ object Huffman {
 
     def testBranch(branch: CodeTree, ch: Char): Boolean = {
       branch match {
-        case Leaf(c, _) => if (c == ch) true else false
-        case Fork(_, _, cs, _) => if (cs.contains(ch)) true else false
+        case Leaf(c, _) => c == ch
+        case Fork(_, _, cs, _) => cs.contains(ch)
       }
     }
 
@@ -371,7 +367,7 @@ object Huffman {
 
   def loop(tree: CodeTree, acc:CodeTable): CodeTable = {
     tree match {
-      case Leaf(c, _) => acc
+      case Leaf(_, _) => acc
 
       case Fork(left, right, _, _) =>
         val afterLeft = left match {

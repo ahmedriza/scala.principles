@@ -303,6 +303,14 @@ class HuffmanSuite extends FunSuite {
     assert(bits === secret)
   }
 
+  // TODO
+  // The following test case failed in grader
+  /*
+    [Test Description] 'createCodeTree(someText)' gives an optimal encoding, the number of bits when encoding 'someText' is minimal
+    [Observed Error] 2048 did not equal 1919
+    [Lost Points] 15
+    */
+
   // ---------
 
   private def repeat(c: Char, n: Int): List[Char] = List.fill(n)(c)
