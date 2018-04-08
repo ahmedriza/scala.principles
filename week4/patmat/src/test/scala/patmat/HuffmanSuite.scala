@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.Matchers._
 
 import patmat.Huffman._
 
@@ -166,39 +167,111 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
-  test("loop on small tree") {
-    val codeTree = createCodeTree(
-      repeat('a', 8) ++
-        repeat('b', 3) ++
-        repeat('c', 1) ++
-        repeat('d', 1) ++
-        repeat('e', 1) ++
-        repeat('f', 1) ++
-        repeat('g', 1) ++
-        repeat('h', 1)
-    )
 
-    val result = loop(codeTree, List())
-    println(result)
+  // ---
+
+  test("mergeCodeTables on a, empty b") {
+    val a: CodeTable = List(('a', List(1)), ('b', List(0)))
+    val b: CodeTable = List()
+    val m1 = mergeCodeTables(a, b)
+    assert(m1 === List(('a', List(1)), ('b', List(0))))
   }
 
-  test("mergeCodeTables on very small tables") {
+  test("mergeCodeTables on empty a, b") {
+    val a: CodeTable = List()
+    val b: CodeTable = List(('a', List(1)), ('b', List(0)))
+    val m1 = mergeCodeTables(a, b)
+    assert(m1 === List(('a', List(1)), ('b', List(0))))
+  }
+
+
+  test("mergeCodeTables on disjoint a, b, b larger that a") {
     val a: CodeTable = List(('a', List(0)))
-    val b: CodeTable = List(('a', List(1)), ('d', List(0)))
+    val b: CodeTable = List(('b', List(1)), ('d', List(0)))
 
     val m1 = mergeCodeTables(a, b)
-    println(m1)
+    m1 should contain theSameElementsAs List(('a', List(0)), ('b', List(1)), ('d', List(0)))
   }
 
-  test("mergeCodeTables on small tables") {
+  test("mergeCodeTables on disjoint a, b, a larger that b") {
+    val a: CodeTable = List(('b', List(1)), ('d', List(0)))
+    val b: CodeTable = List(('a', List(0)))
+
+    val m1 = mergeCodeTables(a, b)
+    m1 should contain theSameElementsAs List(('a', List(0)), ('b', List(1)), ('d', List(0)))
+  }
+
+  test("mergeCodeTables on disjoint a, b, a same size as b") {
+    val a: CodeTable = List(('b', List(1)), ('d', List(0)))
+    val b: CodeTable = List(('a', List(0)), ('c', List(1)))
+
+    val m1 = mergeCodeTables(a, b)
+    m1 should contain theSameElementsAs List(('a', List(0)), ('b', List(1)), ('d', List(0)), ('c', List(1)))
+  }
+
+  test("mergeCodeTables on a, b with one element in common") {
     val a: CodeTable = List(('a', List(0)), ('b', List(1)), ('c', List(0)))
     val b: CodeTable = List(('a', List(1)), ('d', List(0)))
     val c: CodeTable = List(('a', List(1)), ('b', List(0)))
 
     val m1 = mergeCodeTables(a, b)
+    m1 should contain theSameElementsAs List(('a', List(0, 1)), ('b', List(1)), ('d', List(0)), ('c', List(0)))
+
     val m2 = mergeCodeTables(m1, c)
+    m2 should contain theSameElementsAs List(('a', List(0, 1, 1)), ('b', List(1, 0)), ('d', List(0)), ('c', List(0)))
+  }
+
+  test("mergeCodeTables on a, b with last two elements in common") {
+    val a: CodeTable = List(('e', List(0)), ('f', List(0)), ('g', List(0)), ('h', List(0)))
+    val b: CodeTable = List(('g', List(1)), ('h', List(1)))
+
+    val m1 = mergeCodeTables(a, b)
+    m1 should contain theSameElementsAs List(('e', List(0)), ('f', List(0)), ('g', List(0, 1)), ('h', List(0, 1)))
+  }
+
+  test("mergeCodeTables on a, b with second element in common") {
+    // This case should not happen in practise
+    val a: CodeTable = List(('z', List(0, 1)), ('d', List(0)), ('b', List(1)), ('c', List(0)))
+    val b: CodeTable = List(('a', List(1)), ('b', List(0)))
+
+    val m1 = mergeCodeTables(a, b)
     println(m1)
-    println(m2)
+
+    // m1 should contain theSameElementsAs List(('a', List(0, 1, 1)), ('b', List(1, 0)), ('d', List(0)), ('c', List(0)))
+  }
+
+  test("loop on one node") {
+    val codeTree = createCodeTree(List('e', 'f', 'g', 'h'))
+    println(codeTree)
+
+    val result = loop(codeTree, List())
+    println(result)
+  }
+
+  test("loop on small tree") {
+    val codeTree = createCodeTree(repeat('a', 8) ++
+      repeat('b', 3) ++
+      repeat('c', 1) ++
+      repeat('d', 1) ++
+      repeat('e', 1) ++
+      repeat('f', 1) ++
+      repeat('g', 1) ++
+      repeat('h', 1)
+    )
+
+    val result = loop(codeTree, List())
+    println(result)
+
+    // List(
+    // (a,List(1)), (a,List(1)), (a,List(1)),
+    // (b,List(0, 1)), (b,List(1)),
+    // (c,List(1)),  (c,List(0, 1))
+    // (d,List(0, 0, 1)),
+    // (e,List(1)), (e,List(1)), (e,List(0))
+    // (f,List(0, 1)), (f,List(0)),
+    // (g,List(1)), (g,List(0, 0)),
+    // (h,List(0, 0, 0))
+
   }
 
   // ---------

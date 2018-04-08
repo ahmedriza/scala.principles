@@ -352,32 +352,32 @@ object Huffman {
   // /      \          /     \       /    \      /    \
   // h(1)   g(1)     f(1)    e(1)   d(1)   c(1) b(3)  a(8)
 
-  def loop(currentTree: CodeTree, acc: CodeTable): CodeTable = {
-    println(s"acc: $acc")
-    currentTree match {
-      // when the passed in tree is just a leaf
+  def loop(tree: CodeTree, acc:CodeTable): CodeTable = {
+    tree match {
       case Leaf(c, _) => acc
 
-      // otherwise it will be a fork
       case Fork(left, right, _, _) =>
-        // merge the left and right code tables
-        left match {
+        val afterLeft = left match {
           case Leaf(c, _) =>
-            println(s"Leaf of left, $left")
             loop(left, mergeCodeTables(List((c, List(0))), acc))
           case Fork(_, _, chars, _) =>
             loop(left, mergeCodeTables(chars.map(c => (c, List(0))), acc))
         }
         right match {
           case Leaf(c, _) =>
-            println(s"Leaf of right, $right")
-            loop(left, mergeCodeTables(List((c, List(1))), acc))
+            loop(right, mergeCodeTables(List((c, List(1))), afterLeft))
           case Fork(_, _, chars, _) =>
-            loop(right, mergeCodeTables(chars.map(c => (c, List(1))), acc))
+            loop(right, mergeCodeTables(chars.map(c => (c, List(1))), afterLeft))
         }
+
+      /*
+      case Fork(left, right, chars, _) =>
+        val l = mergeCodeTables(chars.map(c => (c, List(0))), loop(left, acc))
+        val r = mergeCodeTables(chars.map(c => (c, List(1))), loop(right, acc))
+        mergeCodeTables(l, r)
+        */
     }
   }
-
 
   /**
     * This function takes two code tables and merges them into one. Depending on how you
@@ -385,6 +385,7 @@ object Huffman {
     * on the two parameter code tables.
     */
   def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
+    println(s"merging code tables $a and $b")
     // CodeTable = [(Char, [Bit])]
     // a = [('a', [0]), ('b', [1]), ('c', [0])]
     // b = [('a', [1])]
@@ -402,7 +403,7 @@ object Huffman {
               // merge the two
               (ach, abits ++ bbits) :: mergeCodeTables(as, bs)
             } else {
-              aPair :: bPair :: mergeCodeTables(a, bs)
+              aPair :: mergeCodeTables(as, b)
             }
         }
     }
