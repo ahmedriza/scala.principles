@@ -235,18 +235,14 @@ class HuffmanSuite extends FunSuite {
     val b: CodeTable = List(('a', List(1)), ('b', List(0)))
 
     val m1 = mergeCodeTables(a, b)
-    println(m1)
 
     // m1 should contain theSameElementsAs List(('a', List(0, 1, 1)), ('b', List(1, 0)), ('d', List(0)), ('c', List(0)))
   }
 
   test("convert on one node") {
     val codeTree = createCodeTree(List('e', 'f', 'g', 'h'))
-    println(codeTree)
-
-    val result = convert(codeTree)
-    println(result)
-    result should contain theSameElementsAs List(
+    val codeTable = convert(codeTree)
+    codeTable should contain theSameElementsAs List(
       ('e',List(1, 1)),
       ('f',List(1, 0)),
       ('g',List(0, 1)),
@@ -265,10 +261,9 @@ class HuffmanSuite extends FunSuite {
       repeat('h', 1)
     )
 
-    val result = convert(codeTree)
-    println(result)
+    val codeTable = convert(codeTree)
 
-    result should contain theSameElementsAs List(
+    codeTable should contain theSameElementsAs List(
       ('a',List(1, 1, 1)),
       ('b',List(1, 1, 0)),
       ('c',List(1, 0, 1)),
@@ -278,6 +273,34 @@ class HuffmanSuite extends FunSuite {
       ('g',List(0, 0, 1)),
       ('h',List(0, 0, 0))
     )
+  }
+
+  test("codeBits should find bits for a given char") {
+    val codeTree = createCodeTree(repeat('a', 8) ++
+      repeat('b', 3) ++
+      repeat('c', 1) ++
+      repeat('d', 1) ++
+      repeat('e', 1) ++
+      repeat('f', 1) ++
+      repeat('g', 1) ++
+      repeat('h', 1)
+    )
+
+    val codeTable = convert(codeTree)
+    assert(codeBits(codeTable)('a') === List(1, 1, 1))
+    assert(codeBits(codeTable)('b') === List(1, 1, 0))
+    assert(codeBits(codeTable)('c') === List(1, 0, 1))
+    assert(codeBits(codeTable)('d') === List(1, 0, 0))
+    assert(codeBits(codeTable)('e') === List(0, 1, 1))
+    assert(codeBits(codeTable)('f') === List(0, 1, 0))
+    assert(codeBits(codeTable)('g') === List(0, 0, 1))
+    assert(codeBits(codeTable)('h') === List(0, 0, 0))
+  }
+
+  test("quickEncode on secret") {
+    val secretCode = List('h', 'u', 'f', 'f', 'm', 'a', 'n', 'e', 's', 't', 'c', 'o', 'o', 'l')
+    val bits = quickEncode(frenchCode)(secretCode)
+    assert(bits === secret)
   }
 
   // ---------

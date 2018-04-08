@@ -2,6 +2,8 @@ package patmat
 
 import common._
 
+import scala.annotation.tailrec
+
 /**
   * Huffman coding
   *
@@ -327,8 +329,11 @@ object Huffman {
     * This function returns the bit sequence that represents the character `char` in
     * the code table `table`.
     */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = {
-    ???
+  @tailrec
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table match {
+    // This is in fact, just List.map
+    case Nil => Nil
+    case (x :: xs) => if (x._1 == char) x._2 else codeBits(xs)(char)
   }
 
   /**
@@ -386,7 +391,7 @@ object Huffman {
     * on the two parameter code tables.
     */
   def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
-    println(s"merging code tables $a and $b")
+    // println(s"merging code tables $a and $b")
     a match {
       case Nil => b
       case (aPair :: as) =>
@@ -414,7 +419,10 @@ object Huffman {
     * To speed up the encoding process, it first converts the code tree to a code table
     * and then uses it to perform the actual encoding.
     */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    val codeTable = convert(tree)
+    text.flatMap(codeBits(codeTable))
+  }
 
 
   def main(args: Array[String]): Unit = {
