@@ -126,12 +126,25 @@ object Huffman {
   def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
     case Nil => Nil
     case (t :: Nil) => List(t)
-    case (t1 :: t2 :: ts) => combineTwoNodes(t1, t2) ++ combine(ts)
+    case (t1 :: t2 :: ts) =>
+      val list = combineTwoNodes(t1, t2) ++ ts // combine(ts)
+      list.sortWith((t1, t2) => t1 match {
+        case Leaf(_, t1Leafweight) => t2 match {
+          case Leaf(_, t2Leafweight) => t1Leafweight < t2Leafweight
+          case Fork(_, _, _, t2Forkweight) => t1Leafweight < t2Forkweight
+        }
+        case Fork(_, _, _, t1Forkweight) => t2 match {
+          case Leaf(_, t2Leafweight) => t1Forkweight < t2Leafweight
+          case Fork(_, _, _, t2Forkweight) => t1Forkweight < t2Forkweight
+        }
+      })
   }
 
   def combineTwoNodes(t1: CodeTree, t2: CodeTree): List[CodeTree] = (t1, t2) match {
     case (l1 :Leaf, l2: Leaf) => List(Fork(t1, t2, List(l1.char, l2.char), l1.weight + l2.weight))
     case (f1: Fork, f2: Fork) => List(Fork(t1, t2, f1.chars ++ f2.chars, f1.weight + f2.weight))
+    case (f: Fork, l: Leaf) => List(Fork(f, l, l.char :: f.chars, f.weight + l.weight))
+    case (l: Leaf, f: Fork) => List(Fork(l, f, l.char :: f.chars, f.weight + l.weight))
     case _ => List()
   }
 

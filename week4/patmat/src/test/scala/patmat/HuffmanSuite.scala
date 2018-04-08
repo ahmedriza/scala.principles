@@ -45,6 +45,7 @@ class HuffmanSuite extends FunSuite {
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
   }
 
+
   test("combine of some leaf lists and forks") {
     val e = Leaf('e', 1)
     val f = Leaf('f', 1)
@@ -53,16 +54,22 @@ class HuffmanSuite extends FunSuite {
 
     val leafList = List(e, f, g, h)
     val comb1 = combine(leafList)
+
+
     val comb2 = combine(comb1)
 
-    val expected = List(Fork(
-      Fork(Leaf('e',1), Leaf('f',1), List('e', 'f'), 2),
-      Fork(Leaf('g',1), Leaf('h',1), List('g', 'h'), 2),
-      List('e', 'f', 'g', 'h'),
-      4)
-    )
+    println(comb1)
+    println(comb2)
 
+    val expected =
+      List(Fork(Leaf('g',1),Leaf('h',1),List('g', 'h'),2), Fork(Leaf('e',1),Leaf('f',1),List('e', 'f'),2))
     assert(comb2 === expected)
+  }
+
+  test("combine of some leaf list 2") {
+    val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4), Leaf('y', 5))
+
+    assert(combine(leaflist) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4), Leaf('y', 5)))
   }
 
   test("until on list of code trees") {
@@ -78,7 +85,25 @@ class HuffmanSuite extends FunSuite {
     val leafList = List(a, b, c, d, e, f, g, h)
     val result = until(singleton, combine)(leafList)
 
-    val expected =
+    println(result)
+
+    val expected = List(
+      Fork(
+        Fork(
+          Fork(Leaf('c',1),Leaf('d',1),List('c', 'd'),2),
+          Fork(
+            Fork(Leaf('g',1),Leaf('h',1),List('g', 'h'),2),
+            Fork(Leaf('e',1),Leaf('f',1),List('e', 'f'),2),
+            List('g', 'h', 'e', 'f'),4
+          ),List('c', 'd', 'g', 'h', 'e', 'f'),6
+        ),
+        Fork(Leaf('a',8),Leaf('b',3),List('a', 'b'),11),
+        List('c', 'd', 'g', 'h', 'e', 'f', 'a', 'b'),17
+      )
+    )
+
+
+    val expected_ =
       List(
         Fork(
           Fork(
@@ -302,14 +327,6 @@ class HuffmanSuite extends FunSuite {
     val bits = quickEncode(frenchCode)(secretCode)
     assert(bits === secret)
   }
-
-  // TODO
-  // The following test case failed in grader
-  /*
-    [Test Description] 'createCodeTree(someText)' gives an optimal encoding, the number of bits when encoding 'someText' is minimal
-    [Observed Error] 2048 did not equal 1919
-    [Lost Points] 15
-    */
 
   // ---------
 
