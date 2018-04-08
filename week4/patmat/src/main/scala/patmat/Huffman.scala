@@ -340,8 +340,7 @@ object Huffman {
     * sub-trees, think of how to build the code table for the entire tree.
     */
   def convert(tree: CodeTree): CodeTable = {
-
-    ???
+    loop(tree, List())
   }
 
   //                     (hgfedcba) 17

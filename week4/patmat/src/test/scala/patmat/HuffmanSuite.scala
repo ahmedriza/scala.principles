@@ -240,12 +240,18 @@ class HuffmanSuite extends FunSuite {
     // m1 should contain theSameElementsAs List(('a', List(0, 1, 1)), ('b', List(1, 0)), ('d', List(0)), ('c', List(0)))
   }
 
-  test("loop on one node") {
+  test("convert on one node") {
     val codeTree = createCodeTree(List('e', 'f', 'g', 'h'))
     println(codeTree)
 
-    val result = loop(codeTree, List())
+    val result = convert(codeTree)
     println(result)
+    result should contain theSameElementsAs List(
+      ('e',List(1, 1)),
+      ('f',List(1, 0)),
+      ('g',List(0, 1)),
+      ('h',List(0, 0))
+    )
   }
 
   test("loop on small tree") {
@@ -259,19 +265,19 @@ class HuffmanSuite extends FunSuite {
       repeat('h', 1)
     )
 
-    val result = loop(codeTree, List())
+    val result = convert(codeTree)
     println(result)
 
-    // List(
-    // (a,List(1)), (a,List(1)), (a,List(1)),
-    // (b,List(0, 1)), (b,List(1)),
-    // (c,List(1)),  (c,List(0, 1))
-    // (d,List(0, 0, 1)),
-    // (e,List(1)), (e,List(1)), (e,List(0))
-    // (f,List(0, 1)), (f,List(0)),
-    // (g,List(1)), (g,List(0, 0)),
-    // (h,List(0, 0, 0))
-
+    result should contain theSameElementsAs List(
+      ('a',List(1, 1, 1)),
+      ('b',List(1, 1, 0)),
+      ('c',List(1, 0, 1)),
+      ('d',List(1, 0, 0)),
+      ('e',List(0, 1, 1)),
+      ('f',List(0, 1, 0)),
+      ('g',List(0, 0, 1)),
+      ('h',List(0, 0, 0))
+    )
   }
 
   // ---------
