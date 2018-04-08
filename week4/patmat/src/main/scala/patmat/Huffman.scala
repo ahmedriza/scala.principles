@@ -89,7 +89,11 @@ object Huffman {
   private def insertChar(ch: Char, list: List[(Char, Int)]): List[(Char, Int)] = {
     list match {
       case Nil => List((ch, 1))
-      case (x :: xs) => if (x._1 == ch) (x._1, x._2 + 1) :: xs else x :: insertChar(ch, xs)
+      case (x :: xs) =>
+        if (x._1 == ch)
+          (x._1, x._2 + 1) :: xs
+        else
+          x :: insertChar(ch, xs)
     }
   }
 
