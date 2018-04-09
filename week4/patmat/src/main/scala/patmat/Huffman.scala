@@ -361,23 +361,6 @@ object Huffman {
     loop(tree, List())
   }
 
-  //                     (hgfedcba) 17
-  //                 /                 \
-  //          (hgfe) 4                   (dcba) 13
-  //       /           \               /         \
-  //   (hg) 2          (fe) 2         (dc) 2      (ba) 11
-  // /      \          /     \       /    \      /    \
-  // h(1)   g(1)     f(1)    e(1)   d(1)   c(1) b(3)  a(8)
-  //
-  // a: (1,1,1)
-  // b: (1,1,0)
-  // c: (1,0,1)
-  // d: (1,0,0)
-  // e: (0,1,1)
-  // f: (0,1,0)
-  // g: (0,0,1)
-  // h: (0,0,0)
-
   def loop(tree: CodeTree, acc:CodeTable): CodeTable = {
     tree match {
       case Leaf(_, _) => acc
@@ -404,7 +387,6 @@ object Huffman {
     * on the two parameter code tables.
     */
   def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
-    // println(s"merging code tables $a and $b")
     a match {
       case Nil => b
       case (aPair :: as) =>
