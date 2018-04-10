@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 abstract class Nat {
   def isZero: Boolean
   def predecessor: Nat
-  def successor: Nat
+  def successor: Nat  = new Succ(this)
   def + (that: Nat): Nat
   def - (that: Nat): Nat
 }
@@ -13,9 +13,8 @@ abstract class Nat {
 object Zero extends Nat {
   override def isZero: Boolean = true
   override def predecessor: Nat = throw new IllegalArgumentException("Zero has no predecessor")
-  override def successor: Nat = new Succ(Zero)
   override def +(that: Nat): Nat = that
-  override def -(that: Nat): Nat = throw new IllegalArgumentException("Cannot subtract from zero")
+  override def -(that: Nat): Nat = if (that.isZero) this else throw new IllegalArgumentException("Cannot subtract from zero")
   override def toString: String = "Zero"
 }
 
@@ -25,18 +24,8 @@ class Succ(val n: Nat) extends Nat {
 
   override def predecessor: Nat = n
 
-  override def successor: Nat = new Succ(this)
-
   override def +(that: Nat): Nat = {
-    @tailrec
-    def loop(nat: Nat, acc: Nat): Nat = {
-      if (nat == Zero) {
-        acc
-      } else {
-        loop(nat.predecessor, acc.successor)
-      }
-    }
-    loop(that, this)
+    new Succ(n + that)
   }
 
   override def -(that: Nat): Nat = {
@@ -47,7 +36,10 @@ class Succ(val n: Nat) extends Nat {
         loop(nat.predecessor, acc.predecessor)
       }
     }
-    loop(that, this)
+    // loop(that, this)
+
+    if (that.isZero) this
+    else n - that.predecessor
   }
 
   override def toString: String = s"Succ($n)"

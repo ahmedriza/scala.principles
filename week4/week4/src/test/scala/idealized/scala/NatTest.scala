@@ -9,7 +9,8 @@ import org.scalatest.matchers._
 class NatTest extends FunSuite {
 
   trait Fixture {
-    val one: Nat = Zero.successor
+    val zero: Zero.type = Zero
+    val one: Nat = zero.successor
     val two: Nat = one.successor
     val three: Nat = two.successor
     val four: Nat = three.successor
@@ -21,9 +22,20 @@ class NatTest extends FunSuite {
     assert(zero.successor === new Succ(Zero))
   }
 
-  test("4 - 2 = 1") {
+  test("0 - 0 = 0") {
+    new Fixture {
+      assert(zero - zero === Zero)
+    }
+  }
+
+  test("2 + 2 = 4") {
     new Fixture {
       assert(two + two === four)
+    }
+  }
+
+  test("4 - 2 = 2") {
+    new Fixture {
       assert(four - two === two)
     }
   }
