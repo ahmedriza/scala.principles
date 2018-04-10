@@ -361,6 +361,12 @@ object Huffman {
     loop(tree, List())
   }
 
+  //          (efgh)4
+  //        /       \
+  //     (ef)2       (gh)2
+  //     /   \      /    \
+  //   (e)1  (f)1 (g)1  (h)1
+  //
   def loop(tree: CodeTree, acc:CodeTable): CodeTable = {
     tree match {
       case Leaf(_, _) => acc

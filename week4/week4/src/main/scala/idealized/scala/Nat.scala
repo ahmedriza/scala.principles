@@ -1,5 +1,7 @@
 package idealized.scala
 
+import scala.annotation.tailrec
+
 abstract class Nat {
   def isZero: Boolean
   def predecessor: Nat
@@ -17,7 +19,7 @@ object Zero extends Nat {
   override def toString: String = "Zero"
 }
 
-class Succ(n: Nat) extends Nat {
+class Succ(val n: Nat) extends Nat {
 
   override def isZero: Boolean = false
 
@@ -26,16 +28,34 @@ class Succ(n: Nat) extends Nat {
   override def successor: Nat = new Succ(this)
 
   override def +(that: Nat): Nat = {
-    def loop(nat: Nat, acc: Nat): Nat = nat match {
-      case Zero => acc
-      case next => loop(next.predecessor, acc.successor)
+    @tailrec
+    def loop(nat: Nat, acc: Nat): Nat = {
+      if (nat == Zero) {
+        acc
+      } else {
+        loop(nat.predecessor, acc.successor)
+      }
     }
-    loop(that, that)
+    loop(that, this)
   }
 
-  override def -(that: Nat): Nat = ???
+  override def -(that: Nat): Nat = {
+    def loop(nat: Nat, acc: Nat): Nat = {
+      if (nat == Zero) {
+        acc
+      } else {
+        loop(nat.predecessor, acc.predecessor)
+      }
+    }
+    loop(that, this)
+  }
 
   override def toString: String = s"Succ($n)"
+
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case s: Succ => s.n == this.n
+    case _ => false
+  }
 }
 
 object Nat {
@@ -49,10 +69,15 @@ object Nat {
 
     val two = one.successor
     val three = two.successor
-    val four = one + three // three.successor
+    val four = two + two // three.successor
+    val five = three + two
+    val seven = four + three
 
     println(s"two: $two")
     println(s"three: $three")
     println(s"four: $four")
+    println(s"five: $five")
+    println(s"seven: $seven")
+
   }
 }
