@@ -51,10 +51,11 @@ import scala.annotation.tailrec
   * </pre>
   */
 
-trait MyList[T] {
+trait MyList[+T] {
   def isEmpty: Boolean
   def head: T
   def tail: MyList[T]
+  def prepend[U >: T] (elem: U): MyList[U] = new Cons(elem, this)
 }
 
 class Cons[T](val head: T, val tail: MyList[T]) extends MyList[T] {
@@ -65,7 +66,7 @@ class Cons[T](val head: T, val tail: MyList[T]) extends MyList[T] {
   }
 }
 
-class MyNil[T] extends MyList[T] {
+object MyNil extends MyList[Nothing] {
   override def isEmpty: Boolean = true
   override def head: Nothing = throw new NoSuchElementException("Nil has no head")
   override def tail: Nothing = throw new NoSuchElementException("Nil has no tail")
@@ -75,13 +76,13 @@ class MyNil[T] extends MyList[T] {
 
 object MyList {
 
-  def singleton[T](elem: T) = new Cons(elem, new MyNil)
+  def singleton[T](elem: T) = new Cons(elem, MyNil)
 
-  def apply[T](): MyList[T] = new MyNil()
+  def apply[T](): MyList[T] = MyNil
 
-  def apply(n: Int): MyList[Int] = new Cons[Int](n, new MyNil())
+  def apply(n: Int): MyList[Int] = new Cons[Int](n, MyNil)
 
-  def apply(n1: Int, n2: Int): MyList[Int] = new Cons[Int](n1, new Cons(n2, new MyNil()))
+  def apply(n1: Int, n2: Int): MyList[Int] = new Cons[Int](n1, new Cons(n2, MyNil))
 
   /**
     * nth that takes an integer n and a list and selects the n'th element of the list.
@@ -103,17 +104,22 @@ object MyList {
   }
 }
 
+class Car
+
 object ListObject {
   def main(args: Array[String]): Unit = {
-    val list = new Cons(30, new Cons(20, new Cons(10, new MyNil)))
-    println(list)
-    println(MyList.nth(2, list))
+    val list = new Cons(30, new Cons(20, new Cons(10, MyNil)))
+    println("nth: " + MyList.nth(2, list))
 
     val list1 = MyList()
     val list2 = MyList(10)
     val list3 = MyList(10, 20)
+
+    val list4: MyList[Any] = list3.prepend(new Car)
+
     println(list1)
     println(list2)
     println(list3)
+    println(list4)
   }
 }
