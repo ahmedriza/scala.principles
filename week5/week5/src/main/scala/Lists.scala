@@ -25,8 +25,8 @@ object Lists {
     val nested1 = List(List(1,1,10), 2)
     println("flattening: " + flatten(nested1))
 
-    // val nested2 = List(List(1,1), 2, List(3, List(5, 8)))
-    // println("flattening: " + flatten(nested2))
+    val nested2 = List(List(1,1), 2, List(3, List(5, 8)))
+    println("flattening: " + flatten(nested2))
   }
 
   // -----------------------------------------------------------------
@@ -36,13 +36,10 @@ object Lists {
     * List(List(1,1), 2, List(3, List(5, 8))) = List(1,1,2,3,5,8)
     */
   def flatten(xs: List[Any]): List[Any] = {
-    println(s"flatten: xs = $xs")
     xs match {
-      case Nil => Nil
-      case (List(y :: ys)) => y :: flatten(ys) 
-      case (List(y :: ys) :: yys) => y :: flatten(ys) :: flatten(yys)
-      case z :: zs => z :: flatten(zs)
-      case x => throw new Error(s"Don't know how to handle this: $x")
+      case Nil                => Nil
+      case (x: List[_]) :: ys => flatten(x) ::: flatten(ys)
+      case y :: ys            =>  y :: flatten(ys)
     }
   }
 
