@@ -8,6 +8,10 @@ object MergeSort {
     println(merged)
 
     val c = List(10, 1, 5, 0, 1, 0, 2)
+
+    val sorted = c.sorted
+    println(s"sorted = $sorted")
+
     println(sort(c))
     println(sort(List(2, -4, 5, 7, 1)))
   }
