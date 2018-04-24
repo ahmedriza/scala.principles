@@ -31,4 +31,19 @@ object Reduction {
     (xs foldRight List[U]())( (a, b) => f(a) :: b )
 
   def lengthFun[T](xs: List[T]): Int = (xs foldRight 0)((_, b) => b+1)
+
+  def product(xs: List[Int]): Int = xs match {
+    case Nil => 1
+    case (y :: ys) => y * product(ys)
+  }
+
+  def foldLeft[T, U](xs: List[T], z: U)(op: (U, T) => U): U = xs match {
+    case Nil => z
+    case (y :: ys) => foldLeft(ys, op(z, y))(op)
+  }
+
+  def foldRight[T, U](xs: List[T], z: U)(op: (T, U) => U): U = xs match {
+    case Nil => z
+    case (y :: ys) => op(y, foldRight(ys, z)(op))
+  }
 }
