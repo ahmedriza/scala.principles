@@ -5,6 +5,7 @@ object Collections {
     val vec = Vector[Int](50, 60, 70)
     val vec2: Vector[Int] = 10 +: vec
     println(vec)
+
     println(vec2)
     println("vec2(0): " + vec2.apply(0))
 
@@ -19,8 +20,9 @@ object Collections {
     println("scala product: " + scalaProduct(v1, v2))
 
     for (i <- 1 to 100) {
-      if(isPrime(i))
+      if(isPrime(i)) {
         println(s"isPrime $i: " + isPrime(i))
+      }
     }
   }
 
@@ -36,20 +38,20 @@ object Collections {
   }
 
   /**
-    *  Scala product 
+    *  Scala product
     *  @param xs xs
     *  @param ys ys
     */
   def scalaProduct(xs: Vector[Double], ys: Vector[Double]): Double = {
-    val result = (xs zip ys) map {
+    (xs zip ys) map {
       case (x, y) => x  * y
     } sum
-  
-    result
   }
 
   /**
     *  A number is prime if the only divisors of n are 1 and n itself.
+    *  @param nn
+    *  @return whether n is prime or not
     */
   def isPrime(n: Int): Boolean = {
     (2 until n) forall (d => n % d != 0)
