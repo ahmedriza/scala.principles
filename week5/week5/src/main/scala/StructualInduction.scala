@@ -1,6 +1,6 @@
 
-object CombinatorialSearch {
 
+object StructuralInduction {
   def main(args: Array[String]): Unit = {
     
   }

@@ -1,3 +1,4 @@
+package org.onedigit.scala
 
 class CubeCalculatorTest extends org.scalatest.FunSuite {
   test("CubeCalculator.cube") {
