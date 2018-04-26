@@ -17,7 +17,21 @@ package org.onedigit.scala
  *    +---+---+---+---+
  * 3  |   |   | x |   |
  *    +---+---+---+---+
+ *  
+ *    (2, 0, 3, 1)
+ * 
+ *      0   1   2  3
+ *    +---+-- +---+---+
+ * 0  |   |   | x |   |
+ *    +---+---+---+---+
+ * 1  | x |   |   |   |
+ *    +---+---+---+---+
+ * 2  |   |   |   | x |
+ *    +---+---+---+---+
+ * 3  |   | x |   |   |
+ *    +---+---+---+---+
  *
+ *    (1, 3, 0, 2)
  *
  * We now develop a solution for a chessboard of any size, not just 8.
  *
@@ -55,6 +69,46 @@ package org.onedigit.scala
 
 object Queens {
   def queens(n: Int): Set[List[Int]] = {
-    ???
+    println(s"queens, n = $n")
+    val solution = findSolution(n, 0, 1, List[Int]())
+    println(s"solution: $solution")
+    Set()
+  }
+
+  def findSolution(n: Int, row: Int, col: Int, currentSolution: List[Int]): List[Int] = {
+    if (currentSolution.length == n) { // found solution
+      currentSolution
+    } else if (col > n - 1) {
+      println(s"Backtracking to row ${row - 1}, currentSolution is: $currentSolution")
+      findSolution(n, row - 1, 0, currentSolution)
+    } else {
+      println(s"row: $row, col: $col")
+      if (isSafe(row, col, n, currentSolution)) {
+        println(s"\tcol: $col is safe, current solution is: ${col :: currentSolution}")
+        findSolution(n, row + 1, 0, col :: currentSolution)
+      } else {
+        findSolution(n, row, col + 1, currentSolution)
+      }
+    }
+  }
+
+  def isSafe(row: Int, col: Int, n: Int, solution: List[Int]): Boolean = {
+    // Given a solution list, work out the rows and columns where the queens are located
+    // The solution list contains the columns where a queen is. The first element in the list is for the last row
+    val rowColumns = ((solution.length - 1) to 0 by -1) zip solution
+    val result = for {
+      d <- diagonals(row, col, n: Int)
+      if (rowColumns.contains(d))
+    } yield d
+
+    !solution.contains(col) && result.isEmpty
+  }
+
+  def diagonals(row: Int, col: Int, n: Int): Seq[(Int, Int)] = {
+    val ul = ((row - 1) to 0 by -1) zip ((col - 1) to 0 by -1)
+    val ur = ((row - 1) to 0 by -1) zip ((col + 1) until n)
+    val ll = ((row + 1) until n) zip ((col - 1) to 0 by -1)
+    val lr = ((row + 1) until n) zip ((col + 1) until n)
+    ul ++ ur ++ ll ++ lr
   }
 }
