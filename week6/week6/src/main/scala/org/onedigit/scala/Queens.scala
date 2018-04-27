@@ -70,7 +70,7 @@ package org.onedigit.scala
 object Queens {
   def queens(n: Int): Set[List[Int]] = {
     println(s"queens, n = $n")
-    val solution = findSolution(n, 0, 1, List[Int]())
+    val solution = findSolution(n, 0, 2, List[Int]())
     println(s"solution: $solution")
     Set()
   }
@@ -80,7 +80,7 @@ object Queens {
       currentSolution
     } else if (col > n - 1) {
       println(s"Backtracking to row ${row - 1}, currentSolution is: $currentSolution")
-      findSolution(n, row - 1, 0, currentSolution)
+      findSolution(n, row - 1, currentSolution.head + 1, currentSolution.tail)
     } else {
       println(s"row: $row, col: $col")
       if (isSafe(row, col, n, currentSolution)) {
