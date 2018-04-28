@@ -3,89 +3,90 @@ package org.onedigit.scala
 import scala.annotation.tailrec
 
 /**
-  * The eight queens problem is to place eight queens on a chessboard so
-  * that no queen is threatened by another.
-  *
-  * In other words, there can't be two queens in the same row, column
-  * or diagonal. Exmaple for a board of size 4x4:
-  *
-  * 0   1   2  3
-  * +---+-- +---+---+
-  * 0  |   | x |   |   |
-  * +---+---+---+---+
-  * 1  |   |   |   | x |
-  * +---+---+---+---+
-  * 2  | x |   |   |   |
-  * +---+---+---+---+
-  * 3  |   |   | x |   |
-  * +---+---+---+---+
-  *
-  * (2, 0, 3, 1)
-  *
-  * 0   1   2  3
-  * +---+-- +---+---+
-  * 0  |   |   | x |   |
-  * +---+---+---+---+
-  * 1  | x |   |   |   |
-  * +---+---+---+---+
-  * 2  |   |   |   | x |
-  * +---+---+---+---+
-  * 3  |   | x |   |   |
-  * +---+---+---+---+
-  *
-  * (1, 3, 0, 2)
-  *
-  * We now develop a solution for a chessboard of any size, not just 8.
-  *
-  * One way to solve the problem is to place a queen on each row.
-  *
-  * Once we have placed k - 1 queens, one must place the kth queen in
-  * a column where it's not "in check" with any other queen on the
-  * board.
-  *
-  * We can solve this problem with a recursive algorithm:
-  *
-  * (1) Suppose that we have already generated all the solutions consisting
-  * of placing k-1 queens on a board of size n.
-  *
-  * (2) Each solution is represented by a list (of length k-1) containing
-  * the number of columns (between 0 and n-1).
-  *
-  * (3) The column number of the queen in the k-1 th row comes first in the
-  * list, followed by the column number of the queen in row k-2 etc.
-  *
-  * (4) The solution set is thus represented as a set of lists, with one
-  * element for each solution.
-  * Exmaple for the 4x4 board.  For the 3 queens placed, we would have the list List(0, 3, 1),
-  * then we can add the fourth queen to get a solution:
-  *
-  * List(2, 0, 3, 1)
-  *
-  * (5) Now, to place the kth queen, we generate all possible extensions of each solution preceded by a new queen
-  *
-  */
+ * The eight queens problem is to place eight queens on a chessboard so
+ * that no queen is threatened by another.
+ *
+ * In other words, there can't be two queens in the same row, column
+ * or diagonal. Exmaple for a board of size 4x4:
+ *
+ * 0   1   2  3
+ * +---+-- +---+---+
+ * 0  |   | x |   |   |
+ * +---+---+---+---+
+ * 1  |   |   |   | x |
+ * +---+---+---+---+
+ * 2  | x |   |   |   |
+ * +---+---+---+---+
+ * 3  |   |   | x |   |
+ * +---+---+---+---+
+ *
+ * (2, 0, 3, 1)
+ *
+ * 0   1   2  3
+ * +---+-- +---+---+
+ * 0  |   |   | x |   |
+ * +---+---+---+---+
+ * 1  | x |   |   |   |
+ * +---+---+---+---+
+ * 2  |   |   |   | x |
+ * +---+---+---+---+
+ * 3  |   | x |   |   |
+ * +---+---+---+---+
+ *
+ * (1, 3, 0, 2)
+ *
+ * We now develop a solution for a chessboard of any size, not just 8.
+ *
+ * One way to solve the problem is to place a queen on each row.
+ *
+ * Once we have placed k - 1 queens, one must place the kth queen in
+ * a column where it's not "in check" with any other queen on the
+ * board.
+ *
+ * We can solve this problem with a recursive algorithm:
+ *
+ * (1) Suppose that we have already generated all the solutions consisting
+ * of placing k-1 queens on a board of size n.
+ *
+ * (2) Each solution is represented by a list (of length k-1) containing
+ * the number of columns (between 0 and n-1).
+ *
+ * (3) The column number of the queen in the k-1 th row comes first in the
+ * list, followed by the column number of the queen in row k-2 etc.
+ *
+ * (4) The solution set is thus represented as a set of lists, with one
+ * element for each solution.
+ * Exmaple for the 4x4 board.  For the 3 queens placed, we would have the list List(0, 3, 1),
+ * then we can add the fourth queen to get a solution:
+ *
+ * List(2, 0, 3, 1)
+ *
+ * (5) Now, to place the kth queen, we generate all possible extensions of each solution preceded by a new queen
+ *
+ */
 
 object Queens {
 
   def queens(n: Int): Set[List[Int]] = {
 
-    def placeQueens(row: Int): Set[List[Int]] = {
-      if (row == 0) {
+    def placeQueens(k: Int): Set[List[Int]] = {
+      if (k == 0) { // zero queens to place
         Set(List())
       } else {
-        placeQueens(row - 1).flatMap(queens => {
+        placeQueens(k - 1).flatMap(queens => {
           (0 until n).filter(col => {
-            val safe = isSafe(row, col, n, queens)
+            val safe = isSafe(col, queens)
             safe
-          }).map(col => col :: queens)
+          }).map(col => {
+            println(s"k = $k, col = $col, queens: $queens")
+            col :: queens
+          })
         })
-
         /*
         for {
-          queens <- placeQueens(row - 1)
+          queens <- placeQueens(k - 1)
           col <- 0 until n
-          safe = isSafe(row, col, n, queens)
-          if safe
+          if isSafe(col, queens)
         } yield col :: queens
         */
       }
@@ -99,13 +100,24 @@ object Queens {
   // It is assumed that the new queen is placed in the next available row after the other placed queens (in other
   // words: in row queens.length)
 
+  def isSafe(col: Int, queens: List[Int]): Boolean = {
+    val row = queens.length
+    val queensWithRows = (row - 1 to 0 by -1) zip queens
+
+    queensWithRows.forall {
+      case (r, c) => col != c && math.abs(col - c) != math.abs(row - r)
+    }
+  }
+
+  // ------------------------------------------------------------------------------------------------------------------
+
   def isSafe(row: Int, col: Int, n: Int, solution: List[Int]): Boolean = {
     // Given a solution list, work out the rows and columns where the queens are located
     // The solution list contains the columns where a queen is. The first element in the list is for the last row
     val rowColumns = ((solution.length - 1) to 0 by -1) zip solution
     val result = for {
       d <- diagonals(row, col, n: Int)
-      if (rowColumns.contains(d))
+      if rowColumns.contains(d)
     } yield d
 
     !solution.contains(col) && result.isEmpty
