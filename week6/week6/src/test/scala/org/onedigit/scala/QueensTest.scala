@@ -58,4 +58,15 @@ class QueensTest extends org.scalatest.FunSuite {
     val solutions = Queens.queens(4)
     solutions.foreach(println)
   }
+
+  test("filter") {
+
+    val list1 = (0 to 10).withFilter(p => p % 2 == 0).map(x => x)
+    println(list1)
+
+    val list2 = (0 to 10).filter(p => {
+      p % 2 == 0
+    })
+    println(list2)
+  }
 }

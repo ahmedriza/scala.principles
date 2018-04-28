@@ -9,31 +9,31 @@ import scala.annotation.tailrec
  * In other words, there can't be two queens in the same row, column
  * or diagonal. Exmaple for a board of size 4x4:
  *
- * 0   1   2  3
- * +---+-- +---+---+
+ *      0   1   2  3
+ *    +---+-- +---+---+
  * 0  |   | x |   |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 1  |   |   |   | x |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 2  | x |   |   |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 3  |   |   | x |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  *
- * (2, 0, 3, 1)
+ *    (2, 0, 3, 1)
  *
- * 0   1   2  3
- * +---+-- +---+---+
+ *      0   1   2  3
+ *    +---+-- +---+---+
  * 0  |   |   | x |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 1  | x |   |   |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 2  |   |   |   | x |
- * +---+---+---+---+
+ *    +---+---+---+---+
  * 3  |   | x |   |   |
- * +---+---+---+---+
+ *    +---+---+---+---+
  *
- * (1, 3, 0, 2)
+ *    (1, 3, 0, 2)
  *
  * We now develop a solution for a chessboard of any size, not just 8.
  *
@@ -67,19 +67,69 @@ import scala.annotation.tailrec
 
 object Queens {
 
-  def queens(n: Int): Set[List[Int]] = {
+  def queens(n: Int): List[List[Int]] = {
 
-    def placeQueens(k: Int): Set[List[Int]] = {
+    // k = 0: Set()
+    // k = 1: Set( List(0), List(1), List(2), List(3) )
+    //
+    // k = 2
+    // List(0) => List(2, 0)
+    // Q * * *
+    // * * Q *
+    // * * * *
+    // * * * *
+    // List(0) => List(3, 0)
+    // Q * * *
+    // * * * Q
+    // * * * *
+    // * * * *
+
+    // k = 2
+    // List(1) => List(3, 1)
+    // * Q * *
+    // * * * Q
+    // * * * *
+    // * * * *
+    // k = 2
+    // List(2) => List(0, 2)
+    // * * Q *
+    // Q * * *
+    // * * * *
+    // * * * *
+    // k = 2
+    // List(3) => List(0, 3)
+    // * * * Q
+    // Q * * *
+    // * * * *
+    // * * * *
+    // k = 2
+    // List(3) => List(1, 3)
+    // * * * Q
+    // * Q * *
+    // * * * *
+    // * * * *
+    //
+    // k = 3
+    // List(2,0)
+    // Q * * *
+    // * * Q *
+    // * * * *
+    // * * * *
+
+
+    def placeQueens(k: Int): List[List[Int]] = {
       if (k == 0) { // zero queens to place
-        Set(List())
+        List(List())
       } else {
         placeQueens(k - 1).flatMap(queens => {
           (0 until n).filter(col => {
+            println(s"k = $k, col = $col, sol: $queens")
             val safe = isSafe(col, queens)
             safe
           }).map(col => {
-            println(s"k = $k, col = $col, queens: $queens")
-            col :: queens
+            val newSolution = col :: queens
+            println(s"\tk = $k, col = $col, new sol: $newSolution")
+            newSolution
           })
         })
         /*
@@ -95,11 +145,6 @@ object Queens {
     placeQueens(n)
   }
 
-  // Write a function which tests if a queen place in an indicated column col is secure amongst the other placed
-  // queens.
-  // It is assumed that the new queen is placed in the next available row after the other placed queens (in other
-  // words: in row queens.length)
-
   def isSafe(col: Int, queens: List[Int]): Boolean = {
     val row = queens.length
     val queensWithRows = (row - 1 to 0 by -1) zip queens
@@ -112,8 +157,6 @@ object Queens {
   // ------------------------------------------------------------------------------------------------------------------
 
   def isSafe(row: Int, col: Int, n: Int, solution: List[Int]): Boolean = {
-    // Given a solution list, work out the rows and columns where the queens are located
-    // The solution list contains the columns where a queen is. The first element in the list is for the last row
     val rowColumns = ((solution.length - 1) to 0 by -1) zip solution
     val result = for {
       d <- diagonals(row, col, n: Int)
