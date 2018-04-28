@@ -46,6 +46,7 @@ class QueensTest extends org.scalatest.FunSuite {
     *    +---+---+---+---+
     */
   test("queens") {
-    Queens.queens(4)
+    val solutions = Queens.queens(4)
+    solutions.foreach(println)
   }
 }
