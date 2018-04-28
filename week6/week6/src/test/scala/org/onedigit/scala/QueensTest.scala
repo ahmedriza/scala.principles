@@ -46,6 +46,6 @@ class QueensTest extends org.scalatest.FunSuite {
     *    +---+---+---+---+
     */
   test("queens") {
-    Queens.queens(8)
+    Queens.queens(4)
   }
 }
