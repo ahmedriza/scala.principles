@@ -56,6 +56,7 @@ class QueensTest extends org.scalatest.FunSuite {
    */
   test("queens") {
     val solutions = Queens.queens(4)
+    println("Number of solutions: " + solutions.length)
     solutions.foreach(println)
   }
 
