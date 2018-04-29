@@ -1,5 +1,6 @@
 package org.onedigit.scala
 
+import scala.collection.immutable
 import scala.io.{BufferedSource, Source}
 
 // Assume you're given a dictionary, words, as a list of words.
@@ -50,7 +51,7 @@ object PhoneNumbers {
     * e.g. "5282" -> List("Java", "Kata", "Lava", ...)
     * Note that a missing number should map to the empty set, e.g. "1111" -> List()
     */
-  def wordsForNum: Map[String, Seq[String]] = words.groupBy(wordCode) withDefaultValue Nil
+  def wordsForNum: Map[String, List[String]] = words.groupBy(wordCode) withDefaultValue Nil
 
   /**
     * Return all the ways to encode a number as a list of words.
@@ -60,10 +61,20 @@ object PhoneNumbers {
     ???
   }
 
+  def recursiveEncode(number: String, acc: List[String]): Unit = {
+    if (number.isEmpty) {
+      println(acc)
+    } else {
+      val words: List[String] = wordsForNum(number)
+    }
+  }
+
 
   def main(args: Array[String]): Unit = {
 
-    println(wordsForNum.get("5282"))
+    println(wordsForNum.get("7225"))
+    println(wordsForNum.get("247"))
+    println(wordsForNum.get("386"))
   }
 
 }
