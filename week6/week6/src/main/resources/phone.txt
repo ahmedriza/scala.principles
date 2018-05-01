@@ -1,0 +1,17 @@
+7225247386
+
+List(pack, bird, to)
+List(rack, bird, to)
+List(sack, bird, to)
+
+List(pack, air, fun)
+List(rack, air, fun)
+List(sack, air, fun)
+
+List(pack, ah, re, to)
+List(rack, ah, re, to)
+List(sack, ah, re, to)
+
+
+List(Scala, is, fun)
+List(Scala, ire, to)

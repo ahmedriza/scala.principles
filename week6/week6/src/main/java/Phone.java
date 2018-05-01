@@ -8,21 +8,18 @@ public class Phone {
 
     public static void main(String[] args) {
         Phone phone = new Phone();
-        // System.out.println(phone.wordCode("Java"));
-        // System.out.println(phone.wordsForNum.get("5282"));
-        Set<List<String>> acc = new HashSet<>();
-        phone.encode("47386", acc);
-        System.out.println(acc);
+        List<List<String>> result = phone.encode("7225247386");
+        // Set<List<String>> result = phone.encode("47386");
+        result.forEach(System.out::println);
     }
 
-    private final List<String> words;
-    private final Map<Character, String> mnemonics = new HashMap<>();
     private final Map<Character, Character> charCode = new HashMap<>();
     private final Map<String, List<String>> wordsForNum;
 
     private Phone() {
-        words = getWords();
+        List<String> words = getWords();
 
+        Map<Character, String> mnemonics = new HashMap<>();
         mnemonics.put('2', "ABC");
         mnemonics.put('3', "DEF");
         mnemonics.put('4', "GHI");
@@ -42,33 +39,39 @@ public class Phone {
         wordsForNum = words.stream().collect(Collectors.groupingBy(this::wordCode));
     }
 
-    public Set<List<String>> encode(String number, Set<List<String>> acc) {
+    private List<List<String>> encode(String number) {
         if (number.isEmpty()) {
-            Set<List<String>> result = new HashSet<>();
+            List<List<String>> result = new ArrayList<>();
             result.add(new ArrayList<>());
             return result;
         } else {
-            Set<List<String>> result = new HashSet<>();
+            List<List<String>> result = new ArrayList<>();
 
             for (int i = 1; i <= number.length(); i++) {
                 String prefix = number.substring(0, i);
-                List<String> ws = wordsForNum.get(prefix);
+                String suffix = number.substring(i);
 
-                if (ws != null) {
-                    String suffix = number.substring(i);
-                    Set<List<String>> rest = encode(suffix, acc);
-                    if (!rest.isEmpty()) {
-                        System.out.println("number: " + number + ", prefix: " + prefix
-                                + ", ws: " + ws + ": suffix = "
-                                + suffix + ", rest: " + rest);
-                        rest.add(ws);
-                        acc.addAll(rest);
+                List<String> words = wordsForNum.getOrDefault(prefix, Collections.emptyList());
+
+                for (String  word : words) {
+
+                    List<List<String>> rest = encode(suffix);
+
+                    for (List<String> strings : rest) {
+                        result.add(addToList(word, strings));
                     }
                 }
             }
 
             return result;
         }
+    }
+
+    private List<String> addToList(String word, List<String> list) {
+        List<String> result = new ArrayList<>();
+        result.add(word);
+        result.addAll(list);
+        return result;
     }
 
     private String wordCode(String code)  {
@@ -80,7 +83,7 @@ public class Phone {
         return sb.toString();
     }
 
-    List<String> getWords() {
+    private List<String> getWords() {
         List<String> words = new ArrayList<>();
 
         String file = Phone.class.getResource("/linuxwords.txt").getFile();

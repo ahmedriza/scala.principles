@@ -14,6 +14,17 @@ import scala.io.{BufferedSource, Source}
 
 object PhoneNumbers {
 
+
+  def main(args: Array[String]): Unit = {
+    val number = "7225247386"
+    // val number = "47386"
+    // println(wordsForNum.get("72252"))
+    // println(wordsForNum.get("473"))
+    // println(wordsForNum.get("86"))
+    // recursiveEncode(number, List())
+    encode(number).foreach(println)
+  }
+
   val in: BufferedSource = Source.fromFile("src/main/resources/linuxwords.txt")
 
   val words: List[String] = in.getLines().toList.filter(word => word.forall(chr => chr.isLetter))
@@ -133,15 +144,5 @@ object PhoneNumbers {
     }
   }
 
-
-  def main(args: Array[String]): Unit = {
-    // val number = "7225247386"
-    val number = "47386"
-    // println(wordsForNum.get("72252"))
-    // println(wordsForNum.get("473"))
-    // println(wordsForNum.get("86"))
-    // recursiveEncode(number, List())
-    encode(number).foreach(println)
-  }
 
 }
