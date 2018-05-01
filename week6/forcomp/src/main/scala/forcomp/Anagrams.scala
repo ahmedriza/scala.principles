@@ -15,6 +15,10 @@ object Anagrams {
     println(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))))
     println(wordAnagrams("learn"))
 
+    println("-------------------------------------")
+    val occurrences = List(('a', 2), ('b', 2))
+    println(s"Combinations of $occurrences")
+    combinations(occurrences).foreach(println)
   }
 
   /** A word is simply a `String`. */
@@ -99,7 +103,14 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+
+    val result = for {
+      occ <- occurrences
+    } yield (occ._1, occ._2 - 1)
+
+    List(result)
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
