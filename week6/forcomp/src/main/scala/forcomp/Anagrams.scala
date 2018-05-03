@@ -32,51 +32,10 @@ object Anagrams {
     combinations(occurrences).foreach(println)
     println("-------------------------------------")
 
-    combinations_(occurrences) foreach println
+    combs(occurrences) foreach println
   }
 
-  // (), ((a,1)), ((a,2))
-  // (), ((b,1)), ((b,2))
-  // ((a,1), (b,1)), ((a,2), (b,1))
-  // ((a,1), (b,2)), ((a,2), (b,2))
-  //
-
-  /**
-    * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))?
-    * First, we need to reduce the problem to a smaller-size problem and solve it recursively.
-    * All combinations of (("b", 1), ("c", 1)) are:
-    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
-    * Then, we can add to each of these combinations zero, one or two "a"s
-    * (since we have two "a"s originally). So, all combinations in which we are interested are:
-    *
-    * (), (("a", 1)), (("a", 2)),
-    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
-    * (("b", 1)), (("a", 1), ("b", 1)), (("a", 2), ("b", 1)),
-    *
-    * (("c", 1)), (("a", 1), ("c", 1)), (("a", 2), ("c", 1)),
-    * (("b", 1), ("c", 1)), (("a", 1), ("b", 1), ("c", 1)), (("a", 2), ("b", 1), ("c", 1))
-    *
-    */
-  val e1: List[Occurrences] = List(List())
-
-  def combs(list: List[(Char, Int)]): Unit = {
-
-    val result = list.flatMap {
-      case (c, i) =>
-        for {
-          j <- 1 to i
-        } yield (c, j)
-    }
-
-    println(result)
-  }
-
-  def powerset2(chars: Occurrences): List[Occurrences] = chars match {
-    case Nil => List(Nil)
-    case (c, freq) :: tail =>
-      val subPowerset = powerset2(tail)
-      subPowerset.foldLeft(subPowerset){case (acc, str) => ((c,1) :: str) :: acc}
-  }
+  // -----------
 
   def combinations_(chars: Occurrences): List[Occurrences] = chars match {
     case Nil => List(Nil)
@@ -87,13 +46,7 @@ object Anagrams {
       }
   }
 
-  def expand(acc: List[Occurrences], occurrence: (Char, Int)): List[Occurrences] = occurrence match {
-    case (c, int) =>
-      (for {
-        i <- 0 to int
-        ao <- acc
-      } yield if (i == 0) ao else {(c, i) :: ao}).toList
-  }
+  // -----------
 
   /** A word is simply a `String`. */
   type Word = String
@@ -177,9 +130,74 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
+
+  private val e1: List[Occurrences] = List(List())
+
+  private def expand(acc: List[Occurrences], occurrence: (Char, Int)): List[Occurrences] = occurrence match {
+    case (c, int) =>
+      (for {
+        i <- 0 to int
+        ao <- acc
+      } yield if (i == 0) ao else {(c, i) :: ao}).toList
+  }
+
   def combinations(occurrences: Occurrences): List[Occurrences] = {
     occurrences.reverse.foldLeft(e1)(expand)
   }
+
+  /**
+    * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))?
+    * First, we need to reduce the problem to a smaller-size problem and solve it recursively.
+    * All combinations of (("b", 1), ("c", 1)) are:
+    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
+    * Then, we can add to each of these combinations zero, one or two "a"s
+    * (since we have two "a"s originally). So, all combinations in which we are interested are:
+    *
+    * (), (("a", 1)), (("a", 2)),
+    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
+    * (("b", 1)), (("a", 1), ("b", 1)), (("a", 2), ("b", 1)),
+    *
+    * (("c", 1)), (("a", 1), ("c", 1)), (("a", 2), ("c", 1)),
+    * (("b", 1), ("c", 1)), (("a", 1), ("b", 1), ("c", 1)), (("a", 2), ("b", 1), ("c", 1))
+    *
+    * Example (2)
+    * ------------
+    * pairs of first <- (), ((a,1)), ((a,2))
+    * rest           <- (), ((b,1)), ((b,2))
+    *
+    * Take each pair of first and add to rest:
+    *
+    * ((a,1), (b,1)), ((a,2), (b,1)), ((a,1), (b,2)), ((a,2), (b,2))
+    *
+    */
+
+  def combs(list: List[(Char, Int)]): List[List[(Char, Int)]] = list match {
+    case Nil => List(Nil)
+    case x :: xs =>
+      val rest = combs(xs)
+      // generate all possible pairs of x
+      val expansion = (for {
+        xp <- pairs(x)
+      } yield addPair(xp, rest)).flatten
+
+      expansion ++ rest
+  }
+
+  // generate all possible pairs from x.
+  // e.g. if x = ('a', 2), generate ('a', 1), ('a', 2)
+  def pairs(x: (Char, Int)): List[(Char, Int)] = {
+    (for {
+      i <- 1 to x._2
+    } yield (x._1, i)).toList
+  }
+
+  // add x to each element in rest
+  def addPair(x: (Char, Int), rest: List[List[(Char, Int)]]): List[List[(Char, Int)]] = {
+    for {
+      r <- rest
+    } yield x :: r
+  }
+
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
