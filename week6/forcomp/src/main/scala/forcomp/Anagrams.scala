@@ -22,10 +22,10 @@ object Anagrams {
       List(('a', 1)),
       List(('a', 2)),
       List(('b', 1)),
-      List(('a', 1), ('b', 1)),
-      List(('a', 2), ('b', 1)),
       List(('b', 2)),
+      List(('a', 1), ('b', 1)),
       List(('a', 1), ('b', 2)),
+      List(('a', 2), ('b', 1)),
       List(('a', 2), ('b', 2))
     )
     println(s"Combinations of $occurrences")
@@ -35,19 +35,27 @@ object Anagrams {
     combinations_(occurrences) foreach println
   }
 
+  // (), ((a,1)), ((a,2))
+  // (), ((b,1)), ((b,2))
+  // ((a,1), (b,1)), ((a,2), (b,1))
+  // ((a,1), (b,2)), ((a,2), (b,2))
+  //
+
   /**
-    * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))? First, we need to reduce the
-    * problem to a smaller-size problem and solve it recursively. All combinations of (("b", 1), ("c", 1)) are:
-    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)). Then, we can add to each of these combinations zero, one or
-    * two "a"s (since we have two "a"s originally). So, all combinations in which we are interested are:
+    * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))?
+    * First, we need to reduce the problem to a smaller-size problem and solve it recursively.
+    * All combinations of (("b", 1), ("c", 1)) are:
+    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
+    * Then, we can add to each of these combinations zero, one or two "a"s
+    * (since we have two "a"s originally). So, all combinations in which we are interested are:
     *
     * (), (("a", 1)), (("a", 2)),
-    *
+    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)).
     * (("b", 1)), (("a", 1), ("b", 1)), (("a", 2), ("b", 1)),
     *
     * (("c", 1)), (("a", 1), ("c", 1)), (("a", 2), ("c", 1)),
-    *
     * (("b", 1), ("c", 1)), (("a", 1), ("b", 1), ("c", 1)), (("a", 2), ("b", 1), ("c", 1))
+    *
     */
   val e1: List[Occurrences] = List(List())
 
@@ -192,7 +200,8 @@ object Anagrams {
    *  such that the words have to be from the dictionary.
    *
    *  The number of words in the sentence and its anagrams does not have to correspond.
-   *  For example, the sentence `List("I", "love", "you")` is an anagram of the sentence `List("You", "olive")`.
+   *  For example, the sentence `List("I", "love", "you")` is an anagram of the sentence
+   *  `List("You", "olive")`.
    *
    *  Also, two sentences with the same words but in a different order are considered two different anagrams.
    *  For example, sentences `List("You", "olive")` and `List("olive", "you")` are different anagrams of
@@ -217,11 +226,11 @@ object Anagrams {
    *      List(yes, man)
    *    )
    *
-   *  The different sentences do not have to be output in the order shown above - any order is fine as long as
-   *  all the anagrams are there. Every returned word has to exist in the dictionary.
+   *  The different sentences do not have to be output in the order shown above - any order is fine as
+   *  long as all the anagrams are there. Every returned word has to exist in the dictionary.
    *
-   *  Note: in case that the words of the sentence are in the dictionary, then the sentence is the anagram of itself,
-   *  so it has to be returned in this list.
+   *  Note: in case that the words of the sentence are in the dictionary, then the sentence is the
+   *  anagram of itself, so it has to be returned in this list.
    *
    *  Note: There is only one anagram of an empty sentence.
    */
