@@ -276,22 +276,22 @@ object Anagrams {
    *
    *  Here is a full example of a sentence `List("Yes", "man")` and its anagrams for our dictionary:
    *
-   *    List(
-   *      List(en, as, my),
-   *      List(en, my, as),
-   *      List(man, yes),
-   *      List(men, say),
-   *      List(as, en, my),
-   *      List(as, my, en),
-   *      List(sane, my),
-   *      List(Sean, my),
-   *      List(my, en, as),
-   *      List(my, as, en),
-   *      List(my, sane),
-   *      List(my, Sean),
-   *      List(say, men),
-   *      List(yes, man)
-   *    )
+   *  List(
+   *    List(en, as, my),
+   *    List(en, my, as),
+   *    List(man, yes),
+   *    List(men, say),
+   *    List(as, en, my),
+   *    List(as, my, en),
+   *    List(sane, my),
+   *    List(Sean, my),
+   *    List(my, en, as),
+   *    List(my, as, en),
+   *    List(my, sane),
+   *    List(my, Sean),
+   *    List(say, men),
+   *    List(yes, man)
+   *  )
    *
    *  The different sentences do not have to be output in the order shown above - any order is fine as
    *  long as all the anagrams are there. Every returned word has to exist in the dictionary.
@@ -299,7 +299,19 @@ object Anagrams {
    *  Note: in case that the words of the sentence are in the dictionary, then the sentence is the
    *  anagram of itself, so it has to be returned in this list.
    *
-   *  Note: There is only one anagram of an empty sentence.
+   *  Note: There is only one anagram of an empty sentence. Note that the anagram of the empty sentence
+   *  is the empty sentence itself.
+   *
+   * Hint: First of all, think about the recursive structure of the problem: what is the base case,
+   * and how should the result of a recursive invocation be integrated in each iteration?
+   * Also, using for-comprehensions helps in finding an elegant implementation for this method.
+   *
+   * Test the `sentenceAnagrams` method on short sentences, no more than 10 characters.
+   * The combinations space gets huge very quickly as your sentence gets longer, so the program
+   * may run for a very long time. However for sentences such as `Linux rulez`, `I love you`
+   * or `Mickey Mouse` the program should end fairly quickly -- there are not many other ways to say
+   * these things.
+   *
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 }
