@@ -25,7 +25,8 @@ class AnagramsSuite extends FunSuite  {
 
 
   test("dictionaryByOccurrences.get: eat") {
-    assert(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet) === Some(Set("ate", "eat", "tea")))
+    assert(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet) ===
+      Some(Set("ate", "eat", "tea")))
   }
 
 
@@ -37,8 +38,6 @@ class AnagramsSuite extends FunSuite  {
     assert(wordAnagrams("player").toSet === Set("parley", "pearly", "player", "replay"))
   }
 
-
-
   test("subtract: lard - r") {
     val lard = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
     val r = List(('r', 1))
@@ -46,6 +45,12 @@ class AnagramsSuite extends FunSuite  {
     assert(subtract(lard, r) === lad)
   }
 
+  test("subtract: Ahmeda - a") {
+    val ahmeda = List(('a', 2), ('d', 1), ('e', 1), ('h', 1), ('m', 1))
+    val a = List(('a', 1))
+    val result = List(('a', 1), ('d', 1), ('e', 1), ('h', 1), ('m', 1))
+    assert(subtract(ahmeda, a) === result)
+  }
 
   test("combinations: []") {
     assert(combinations(Nil) === List(Nil))

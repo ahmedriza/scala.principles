@@ -33,6 +33,29 @@ object Anagrams {
     println("-------------------------------------")
 
     combs(occurrences) foreach println
+
+    println("-------------------------------------")
+    val x = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
+    val y = List(('r', 1))
+    val xMap = x.toMap
+    val yMap = y.toMap
+
+    val tmp = xMap.foldLeft(xMap) {
+      case (map, (c, i)) =>
+        yMap.get(c) match {
+          case None => map
+          case Some(yValue) =>
+            val newValue = i - yValue
+            if (newValue == 0) {
+              map.-(c)
+            } else {
+              map.updated(c, i - yValue)
+            }
+        }
+    }
+
+    subtract(x, y) foreach println
+
   }
 
   // -----------
@@ -141,10 +164,6 @@ object Anagrams {
       } yield if (i == 0) ao else {(c, i) :: ao}).toList
   }
 
-  def combinations(occurrences: Occurrences): List[Occurrences] = {
-    occurrences.reverse.foldLeft(e1)(expand)
-  }
-
   /**
     * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))?
     * First, we need to reduce the problem to a smaller-size problem and solve it recursively.
@@ -198,6 +217,10 @@ object Anagrams {
     } yield x :: r
   }
 
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    // occurrences.reverse.foldLeft(e1)(expand)
+    combs(occurrences)
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -206,10 +229,36 @@ object Anagrams {
    *  appear in `x`, and its frequency in `y` must be smaller or equal
    *  than its frequency in `x`.
    *
+   * For example, given two occurrence lists for words `lard` and `r`:
+   * val x = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
+   * val y = List(('r', 1))
+   *
+   * the `subtract(x, y)` is `List(('a', 1), ('d', 1), ('l', 1))`.
+   *
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
+   *
+   *  Hint: you can use `foldLeft`, and `-`, `apply` and `updated` operations on `Map`.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    val xMap = x.toMap
+    val yMap = y.toMap
+
+    xMap.foldLeft(xMap) {
+      case (map, (c, i)) =>
+        yMap.get(c) match {
+          case None => map
+          case Some(yValue) =>
+            val newValue = i - yValue
+            // if new value is zero, then remove the entry from the map
+            if (newValue == 0) {
+              map.-(c)
+            } else {
+              map.updated(c, i - yValue)
+            }
+        }
+    }.toList.sorted
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
