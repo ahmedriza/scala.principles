@@ -16,9 +16,75 @@ object Anagrams {
     println(wordAnagrams("learn"))
 
     println("-------------------------------------")
-    val occurrences = List(('a', 2), ('b', 2))
+    val occurrences: Occurrences = List(('a', 2), ('b', 2))
+    val expected = List(
+      List(),
+      List(('a', 1)),
+      List(('a', 2)),
+      List(('b', 1)),
+      List(('a', 1), ('b', 1)),
+      List(('a', 2), ('b', 1)),
+      List(('b', 2)),
+      List(('a', 1), ('b', 2)),
+      List(('a', 2), ('b', 2))
+    )
     println(s"Combinations of $occurrences")
     combinations(occurrences).foreach(println)
+    println("-------------------------------------")
+
+    combinations_(occurrences) foreach println
+  }
+
+  /**
+    * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))? First, we need to reduce the
+    * problem to a smaller-size problem and solve it recursively. All combinations of (("b", 1), ("c", 1)) are:
+    * (), (("b", 1)), (("c", 1)), (("b", 1), ("c", 1)). Then, we can add to each of these combinations zero, one or
+    * two "a"s (since we have two "a"s originally). So, all combinations in which we are interested are:
+    *
+    * (), (("a", 1)), (("a", 2)),
+    *
+    * (("b", 1)), (("a", 1), ("b", 1)), (("a", 2), ("b", 1)),
+    *
+    * (("c", 1)), (("a", 1), ("c", 1)), (("a", 2), ("c", 1)),
+    *
+    * (("b", 1), ("c", 1)), (("a", 1), ("b", 1), ("c", 1)), (("a", 2), ("b", 1), ("c", 1))
+    */
+  val e1: List[Occurrences] = List(List())
+
+  def combs(list: List[(Char, Int)]): Unit = {
+
+    val result = list.flatMap {
+      case (c, i) =>
+        for {
+          j <- 1 to i
+        } yield (c, j)
+    }
+
+    println(result)
+  }
+
+  def powerset2(chars: Occurrences): List[Occurrences] = chars match {
+    case Nil => List(Nil)
+    case (c, freq) :: tail =>
+      val subPowerset = powerset2(tail)
+      subPowerset.foldLeft(subPowerset){case (acc, str) => ((c,1) :: str) :: acc}
+  }
+
+  def combinations_(chars: Occurrences): List[Occurrences] = chars match {
+    case Nil => List(Nil)
+    case (c, freq) :: tail =>
+      val subPowerset = combinations(tail)
+      subPowerset.foldLeft(subPowerset){case (acc, str) =>
+        (1 to freq).foldLeft(acc){case (acc2, freq2) => (c -> freq2 :: str) :: acc2}
+      }
+  }
+
+  def expand(acc: List[Occurrences], occurrence: (Char, Int)): List[Occurrences] = occurrence match {
+    case (c, int) =>
+      (for {
+        i <- 0 to int
+        ao <- acc
+      } yield if (i == 0) ao else {(c, i) :: ao}).toList
   }
 
   /** A word is simply a `String`. */
@@ -104,12 +170,7 @@ object Anagrams {
    *  in the example above could have been displayed in some other order.
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = {
-
-    val result = for {
-      occ <- occurrences
-    } yield (occ._1, occ._2 - 1)
-
-    List(result)
+    occurrences.reverse.foldLeft(e1)(expand)
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
