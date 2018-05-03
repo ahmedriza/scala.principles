@@ -54,8 +54,11 @@ object Anagrams {
         }
     }
 
-    subtract(x, y) foreach println
+    println("-------------------------------------")
 
+    sentenceAnagrams(List("Yes", "man"))
+    // sentenceAnagrams(List("en", "as", "my"))
+    // sentenceAnagrams(List("my", "sane"))
   }
 
   // -----------
@@ -313,5 +316,22 @@ object Anagrams {
    * these things.
    *
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = sentence match {
+    case Nil => List(Nil)
+    case s =>
+      // TODO
+      val occurrences: Occurrences = sentenceOccurrences(s)
+      println(occurrences)
+
+      val tmp = for {
+        // occurrence combinations
+        occ <- combinations(occurrences)
+        // Get the words that match this occurrence
+        words <- dictionaryByOccurrences.get(occ)
+      } yield words
+
+      tmp foreach println
+
+      List(Nil)
+  }
 }
