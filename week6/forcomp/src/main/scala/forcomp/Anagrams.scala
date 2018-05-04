@@ -17,48 +17,12 @@ object Anagrams {
 
     println("-------------------------------------")
     val occurrences: Occurrences = List(('a', 2), ('b', 2))
-    val expected = List(
-      List(),
-      List(('a', 1)),
-      List(('a', 2)),
-      List(('b', 1)),
-      List(('b', 2)),
-      List(('a', 1), ('b', 1)),
-      List(('a', 1), ('b', 2)),
-      List(('a', 2), ('b', 1)),
-      List(('a', 2), ('b', 2))
-    )
     println(s"Combinations of $occurrences")
     combinations(occurrences).foreach(println)
     println("-------------------------------------")
 
-    combs(occurrences) foreach println
-
-    println("-------------------------------------")
-    val x = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
-    val y = List(('r', 1))
-    val xMap = x.toMap
-    val yMap = y.toMap
-
-    val tmp = xMap.foldLeft(xMap) {
-      case (map, (c, i)) =>
-        yMap.get(c) match {
-          case None => map
-          case Some(yValue) =>
-            val newValue = i - yValue
-            if (newValue == 0) {
-              map.-(c)
-            } else {
-              map.updated(c, i - yValue)
-            }
-        }
-    }
-
-    println("-------------------------------------")
-
-    sentenceAnagrams(List("Yes", "man"))
-    // sentenceAnagrams(List("en", "as", "my"))
-    // sentenceAnagrams(List("my", "sane"))
+    val anagrams = sentenceAnagrams(List("Yes", "man"))
+    anagrams foreach println
   }
 
   // -----------
@@ -129,10 +93,10 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary.groupBy(wordOccurrences)
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary.groupBy(wordOccurrences) withDefaultValue Nil
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] =  dictionaryByOccurrences.getOrElse(wordOccurrences(word), Nil)
+  def wordAnagrams(word: Word): List[Word] =  dictionaryByOccurrences(wordOccurrences(word))
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -157,8 +121,9 @@ object Anagrams {
    *  in the example above could have been displayed in some other order.
    */
 
-  private val e1: List[Occurrences] = List(List())
+  // private val e1: List[Occurrences] = List(List())
 
+  /*
   private def expand(acc: List[Occurrences], occurrence: (Char, Int)): List[Occurrences] = occurrence match {
     case (c, int) =>
       (for {
@@ -166,6 +131,7 @@ object Anagrams {
         ao <- acc
       } yield if (i == 0) ao else {(c, i) :: ao}).toList
   }
+  */
 
   /**
     * How can we find all possible combinations of (("a", 2), ("b", 1), ("c", 1))?
@@ -257,7 +223,7 @@ object Anagrams {
             if (newValue == 0) {
               map.-(c)
             } else {
-              map.updated(c, i - yValue)
+              map.updated(c, newValue)
             }
         }
     }.toList.sorted
@@ -316,22 +282,20 @@ object Anagrams {
    * these things.
    *
    */
+
+  private def anagramsFromOccurrences(occ: Occurrences): List[Sentence] = occ match {
+    case Nil => List(Nil)
+    case _  =>
+      val subsetList = combinations(occ)
+      for {
+        subset <- subsetList
+        anaWord <- dictionaryByOccurrences(subset)
+        s <- anagramsFromOccurrences(subtract(occ, subset))
+      } yield anaWord :: s
+  }
+
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = sentence match {
     case Nil => List(Nil)
-    case s =>
-      // TODO
-      val occurrences: Occurrences = sentenceOccurrences(s)
-      println(occurrences)
-
-      val tmp = for {
-        // occurrence combinations
-        occ <- combinations(occurrences)
-        // Get the words that match this occurrence
-        words <- dictionaryByOccurrences.get(occ)
-      } yield words
-
-      tmp foreach println
-
-      List(Nil)
+    case s => anagramsFromOccurrences(sentenceOccurrences(s))
   }
 }
